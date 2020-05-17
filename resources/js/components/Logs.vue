@@ -130,7 +130,6 @@
           this.type = response.data.type;
           this.user = response.data.user;
           this.ip = response.data.ip;
-          console.log(this.type);
 
           this.types = response.data.types;
           this.users = response.data.users;

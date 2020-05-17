@@ -8,10 +8,6 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
-import vSelect from "vue-select";
-
-import "vue-select/dist/vue-select.css";
-
 Vue.mixin({
   methods: {
 
@@ -33,7 +29,6 @@ Vue.mixin({
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-Vue.component("v-select", vSelect);
 Vue.component('logs', require('./components/Logs.vue').default);
 
 /**
