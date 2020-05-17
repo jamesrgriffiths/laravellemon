@@ -55,15 +55,15 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
+                                  @if(Auth::user()->is_admin)
+                                    <a class="dropdown-item" href="logs">System Logs</a>
+                                    <a class="dropdown-item" href="users">Users</a>
+                                    <a class="dropdown-item" href="user_types">User Types</a>
+                                    <hr>
+                                  @endif
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
+                                  <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
+                                  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
                                 </div>
                             </li>
                         @endguest
@@ -73,8 +73,14 @@
         </nav>
 
         <main class="py-4">
-            @yield('content')
+          <div class="container-fluid">
+            @if (explode(".",Route::current()->getName())[0] == 'logs')<logs></logs>
+            @elseif (explode(".",Route::current()->getName())[0] == 'users')<users></users>
+            @elseif (explode(".",Route::current()->getName())[0] == 'user_types')<userTypes></userTypes>
+            @else @yield('content') @endif
+          </div>
         </main>
+
     </div>
 </body>
 </html>

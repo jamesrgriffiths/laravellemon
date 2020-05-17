@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class HomeController extends Controller {
+class UserTypeController extends Controller {
 
-  // Show the home page
+  // Show the User Types
   public function index() {
-    return view('home');
+    return view('user_types');
   }
 
 }

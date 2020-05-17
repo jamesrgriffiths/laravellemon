@@ -16,7 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+
+Route::resource('home', 'HomeController')->middleware('auth');
+
+// Admin only routes
+Route::resource('logs', 'LogController')->middleware('auth');
+Route::resource('users', 'UserController')->middleware('auth');
+Route::resource('user_types', 'UserTypeController')->middleware('auth');

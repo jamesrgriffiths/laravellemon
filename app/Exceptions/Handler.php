@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Request;
+use App\Repositories\Facades\LogFacade;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -34,9 +36,9 @@ class Handler extends ExceptionHandler
      *
      * @throws \Exception
      */
-    public function report(Throwable $exception)
-    {
-        parent::report($exception);
+    public function report(Throwable $exception) {
+      LogFacade::logException(request(), $exception);
+      parent::report($exception);
     }
 
     /**

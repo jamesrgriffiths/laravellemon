@@ -8,6 +8,21 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+import vSelect from "vue-select";
+
+import "vue-select/dist/vue-select.css";
+
+Vue.mixin({
+  methods: {
+
+    convertDateTime(date, format="en-US") {
+      var cleaned_date = new Date(date);
+      return cleaned_date instanceof Date && !isNaN(cleaned_date) ? cleaned_date.toLocaleString(format) : "";
+    },
+
+  }
+})
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -18,8 +33,8 @@ window.Vue = require('vue');
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component("v-select", vSelect);
+Vue.component('logs', require('./components/Logs.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
