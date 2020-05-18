@@ -1990,11 +1990,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       timer: '',
-      loading: true,
+      loading: false,
       // Filters
       type: '0',
       user: '0',
@@ -2004,7 +2012,9 @@ __webpack_require__.r(__webpack_exports__);
       ips: [],
       total: '',
       show_trace: '',
-      logs: []
+      logs: [],
+      current_page: 1,
+      pages: []
     };
   },
   watch: {
@@ -2019,13 +2029,18 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
-    this.fetchLogs();
-    this.timer = setInterval(this.fetchLogs, 30000);
+    this.fetchLogs(); // this.timer = setInterval(this.fetchLogs, 30000);
+
+    console.log("1");
   },
   beforeDestroy: function beforeDestroy() {
     clearInterval(this.timer);
   },
   methods: {
+    changePage: function changePage(page) {
+      this.current_page = page;
+      this.fetchLogs();
+    },
     deleteLog: function deleteLog(id, type) {
       axios["delete"]("/logs/" + id, {
         data: {
@@ -2036,28 +2051,39 @@ __webpack_require__.r(__webpack_exports__);
     fetchLogs: function fetchLogs() {
       var _this = this;
 
-      this.loading = true;
-      axios.get("/logs", {
-        params: {
-          vue: true,
-          type: this.type,
-          user: this.user,
-          ip: this.ip
-        }
-      }).then(function (response) {
-        _this.type = response.data.type;
-        _this.user = response.data.user;
-        _this.ip = response.data.ip;
-        _this.types = response.data.types;
-        _this.users = response.data.users;
-        _this.ips = response.data.ips;
-        _this.total = response.data.logs.total;
-        _this.logs = response.data.logs.data;
-        _this.loading = false;
-      });
+      console.log("C1");
+
+      if (!this.loading) {
+        this.loading = true;
+        axios.get("/logs", {
+          params: {
+            vue: true,
+            type: this.type,
+            user: this.user,
+            ip: this.ip,
+            current_page: this.current_page
+          }
+        }).then(function (response) {
+          _this.type = response.data.type;
+          _this.user = response.data.user;
+          _this.ip = response.data.ip;
+          _this.types = response.data.types;
+          _this.users = response.data.users;
+          _this.ips = response.data.ips;
+          _this.total = response.data.logs.total;
+          _this.logs = response.data.logs.data;
+          _this.current_page = response.data.current_page;
+          _this.pages = response.data.pages;
+          console.log("C2");
+          _this.loading = false;
+        });
+      }
+
+      console.log("C3");
     },
     toggleShowTrace: function toggleShowTrace(id) {
       this.show_trace == id ? this.show_trace = '' : this.show_trace = id;
+      console.log("D");
     }
   }
 });
@@ -37881,6 +37907,39 @@ var render = function() {
           "div",
           { staticClass: "card-body" },
           [
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "div",
+                { staticClass: "col col-12 flex-center text-center" },
+                _vm._l(_vm.pages, function(page) {
+                  return _c("span", [
+                    page !== ""
+                      ? _c("span", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-sm p-1 m-1",
+                              class:
+                                page == _vm.current_page
+                                  ? "btn-dark"
+                                  : "btn-light",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.changePage(page)
+                                }
+                              }
+                            },
+                            [_vm._v(_vm._s(page))]
+                          )
+                        ])
+                      : _c("span", [_vm._v("   ")])
+                  ])
+                }),
+                0
+              )
+            ]),
+            _vm._v(" "),
             _vm._l(_vm.logs, function(log, i) {
               return _c("div", [
                 _c(
@@ -38019,9 +38078,7 @@ var render = function() {
                   ]
                 )
               ])
-            }),
-            _vm._v(" "),
-            _vm._m(0)
+            })
           ],
           2
         )
@@ -38029,16 +38086,7 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col col-12 flex-center mt-2" })
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

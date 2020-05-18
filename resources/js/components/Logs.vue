@@ -33,7 +33,20 @@
         <!-- Body -->
         <div class="card-body">
 
-          <!-- List of logs -->
+          <!-- Pagination -->
+          <div class="row">
+            <div class="col col-12 flex-center text-center">
+              <span v-for="page in pages">
+                <span v-if="page !== ''">
+                  <button type="button" v-on:click="changePage(page)" class="btn btn-sm p-1 m-1" v-bind:class="page == current_page ? 'btn-dark' : 'btn-light'">{{page}}</button>
+                </span>
+                <span v-else>&nbsp;&nbsp;&nbsp;</span>
+              </span>
+            </div>
+          </div>
+          <!-- END Pagination -->
+
+          <!-- logs -->
           <div v-for="(log,i) in logs">
             <div class="row p-2" v-bind:class="i%2 ? 'bg-light' : ''">
               <div class="col col-12">
@@ -66,12 +79,7 @@
               </div>
             </div>
           </div>
-
-          <div class="row">
-            <div class="col col-12 flex-center mt-2">
-              <!-- {{$logs->appends(['filter' => $filter, 'user_filter' => $user_filter])->links()}} -->
-            </div>
-          </div>
+          <!-- END Logs -->
 
         </div>
 
@@ -86,7 +94,7 @@
     data() {
       return {
         timer: '',
-        loading: true,
+        loading: false,
 
         // Filters
         type: '0',
@@ -99,6 +107,9 @@
         total: '',
         show_trace: '',
         logs: [],
+
+        current_page: 1,
+        pages: [],
       }
     },
 
@@ -110,7 +121,8 @@
 
     created() {
       this.fetchLogs();
-      this.timer = setInterval(this.fetchLogs, 30000);
+      // this.timer = setInterval(this.fetchLogs, 30000);
+      console.log("1");
     },
 
     beforeDestroy () {
@@ -119,30 +131,46 @@
 
     methods: {
 
+      changePage(page) {
+        this.current_page = page;
+        this.fetchLogs();
+      },
+
       deleteLog(id,type) {
         axios.delete("/logs/"+id,{data: {type: type}})
           .then(this.fetchLogs());
       },
 
       fetchLogs() {
-        this.loading = true;
-        axios.get("/logs",{params: {vue: true, type: this.type, user: this.user, ip: this.ip}}).then((response)=>{
-          this.type = response.data.type;
-          this.user = response.data.user;
-          this.ip = response.data.ip;
+        console.log("C1");
+        if(!this.loading) {
+          this.loading = true;
+          axios.get("/logs",{params: {vue: true, type: this.type, user: this.user, ip: this.ip, current_page: this.current_page}}).then((response)=>{
+            this.type = response.data.type;
+            this.user = response.data.user;
+            this.ip = response.data.ip;
 
-          this.types = response.data.types;
-          this.users = response.data.users;
-          this.ips = response.data.ips;
+            this.types = response.data.types;
+            this.users = response.data.users;
+            this.ips = response.data.ips;
 
-          this.total = response.data.logs.total;
-          this.logs = response.data.logs.data;
-          this.loading = false;
-        });
+            this.total = response.data.logs.total;
+            this.logs = response.data.logs.data;
+
+            this.current_page = response.data.current_page;
+            this.pages = response.data.pages;
+
+            console.log("C2");
+
+            this.loading = false;
+          });
+        }
+        console.log("C3");
       },
 
       toggleShowTrace(id) {
         this.show_trace == id ? this.show_trace = '' : this.show_trace = id;
+        console.log("D");
       }
 
     }

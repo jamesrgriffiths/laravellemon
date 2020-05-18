@@ -51,7 +51,7 @@ class LogRepository extends Repository implements LogRepositoryInterface {
       'url' => $request->url(),
       'class' => 'HTTP Request',
       'message' => 'HTTP Request',
-      'trace' => '',
+      'trace' => $request,
     ]);
   }
 

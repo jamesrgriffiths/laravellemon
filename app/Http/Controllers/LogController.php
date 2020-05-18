@@ -16,6 +16,7 @@ class LogController extends Controller {
     $type = $request->type ? $request->type : 0;
     $user = $request->user ? $request->user : 0;
     $ip = $request->ip ? $request->ip : 0;
+    $current_page = $request->current_page ? $request->current_page : 1;
 
     $filter_conditions = [];
     if($type !== 0) $filter_conditions['type'] = strtolower($type);
@@ -23,7 +24,7 @@ class LogController extends Controller {
     if($user == -1) $filter_conditions['user_id'] = NULL;
     if($ip !== 0) $filter_conditions['ip_address'] = $ip;
 
-    $logs = $filter_conditions ? LogFacade::wherePaginated($filter_conditions,'id','DESC',50) : LogFacade::getAllPaginated('id','DESC',50);
+    $logs = $filter_conditions ? LogFacade::wherePaginated($filter_conditions,'id','DESC',50) : LogFacade::getAllPaginated('id','DESC',25);
 
     foreach($logs as $log) {
       $log->type = ucfirst($log->type);
@@ -55,6 +56,30 @@ class LogController extends Controller {
     $ips[] = (object)["id" => 0, "name" => 'IP: ALL'];
     foreach(LogFacade::getIPs() as $obj_ip) { $ips[] = (object)["id" => $obj_ip->ip_address, "name" => strtoupper($obj_ip->ip_address)]; }
 
+    $pages = [];
+    $spread = 3;
+
+    $low_end = $current_page >= $spread ? $current_page - $spread : 1;
+    $high_end = $current_page + $spread <= $logs->lastPage() ? $current_page + $spread : $logs->lastPage();
+
+    if($low_end !== 1) {
+      $pages[] = 1;
+      if($low_end > 2) {
+        $pages[] = '';
+      }
+    }
+
+    for($i=$low_end;$i<=$high_end;$i++) {
+      $pages[] = $i;
+    }
+
+    if($high_end !== $logs->lastPage()) {
+      if($high_end < $logs->lastPage() - 1) {
+        $pages[] = '';
+      }
+      $pages[] = $logs->lastPage();
+    }
+
     $data = [
       "type" => $type,
       "user" => $user,
@@ -64,7 +89,10 @@ class LogController extends Controller {
       "users" => $users,
       "ips" => $ips,
 
-      "logs" => $logs
+      "logs" => $logs,
+
+      "current_page" => $current_page,
+      "pages" => $pages,
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);
@@ -76,12 +104,12 @@ class LogController extends Controller {
     if($request->type == 'delete') {
       LogFacade::delete($id);
     } elseif($request->type == 'delete_class') {
-      $logs = LogFacade::where(['class' => $current_log->class, 'message' => $current_log->message, 'url' => $current_log->url]);
+      $logs = LogFacade::where(['class' => $current_log->class, 'message' => $current_log->message, 'url' => $current_log->url],'id','ASC');
       foreach($logs as $log) {
         LogFacade::delete($log->id);
       }
     } elseif($request->type == 'delete_ip') {
-      $logs = LogFacade::where(['ip_address' => $current_log->ip_address]);
+      $logs = LogFacade::where(['ip_address' => $current_log->ip_address],'id','ASC');
       foreach($logs as $log) {
         LogFacade::delete($log->id);
       }
