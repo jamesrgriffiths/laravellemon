@@ -18,7 +18,8 @@
                 </div>
               </div>
               <div class="col col-10 p-0 pt-1 text-center">
-                USERS: <span class="text-info">{{total}}</span><br/>
+                USER MANAGEMENT
+                <br/> <span v-if="initialized" class="text-info">Total Users: {{total}}</span><br/>
               </div>
               <div class="col col-1 p-0">&nbsp;</div>
             </div>
@@ -26,26 +27,16 @@
         </div>
 
         <!-- Body -->
-        <div class="card-body">
+        <div v-if="initialized" class="card-body">
 
           <!-- Pagination -->
-          <div class="row">
-            <div class="col col-12 flex-center text-center">
-              <span v-for="page in pages">
-                <span v-if="page !== ''">
-                  <button type="button" v-on:click="changePage(page)" class="btn btn-sm p-1 m-1" v-bind:class="page == current_page ? 'btn-dark' : 'btn-light'">{{page}}</button>
-                </span>
-                <span v-else>&nbsp;&nbsp;&nbsp;</span>
-              </span>
-            </div>
-          </div>
-          <!-- END Pagination -->
+          <pagination :page="page" :pages="pages"></pagination>
 
           <!-- Users -->
           <div v-for="(user,i) in users">
             <div class="row p-2" v-bind:class="i%2 ? 'bg-light' : ''">
               <div class="col col-12">
-
+                {{user.name}}
               </div>
               <div class="col col-12 col-md-3">
 
@@ -74,56 +65,54 @@
 </template>
 
 <script>
+
+  import pagination from './sub_components/pagination';
+
   export default {
+
+    components: { pagination },
 
     data() {
       return {
         timer: '',
         loading: false,
+        initialized: false,
 
-        total: '',
         users: [],
 
-        current_page: 1,
+        total: 0,
+        page: 1,
         pages: [],
       }
     },
 
-    watch: {
-
-    },
-
     created() {
-      this.fetchUsers();
+      this.fetchData();
     },
 
     methods: {
 
-      changePage(page) {
-        this.current_page = page;
-        this.fetchUserTypes();
-      },
-
       deleteUsers(id) {
         axios.delete("/users/"+id)
-          .then(this.fetchUsers());
+          .then(this.fetchData());
       },
 
-      fetchUsers() {
-        if(!this.loading) {
-          this.loading = true;
-          axios.get("/users",{params: {vue: true, current_page: this.current_page}}).then((response)=>{
-            this.users = response.data.users;
+      fetchData() {
+        this.loading = true;
+        axios.get("/users",{params: {vue: true, page: this.page}}).then((response)=>{
+          this.users = response.data.users.data;
 
-            this.current_page = response.data.current_page;
-            this.pages = response.data.pages;
+          this.total = response.data.users.total;
+          this.page = parseInt(response.data.page);
+          this.pages = response.data.pages;
 
-            this.loading = false;
-          });
-        }
+          this.loading = false;
+          this.initialized = true;
+        });
       }
 
     }
 
   };
+  
 </script>

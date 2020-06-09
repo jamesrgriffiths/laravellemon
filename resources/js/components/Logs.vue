@@ -34,17 +34,7 @@
         <div class="card-body" v-if="initialized">
 
           <!-- Pagination -->
-          <div class="row">
-            <div class="col col-12 flex-center text-center">
-              <span v-for="selected_page in pages">
-                <span v-if="selected_page !== ''">
-                  <button type="button" v-on:click="changePage(selected_page)" class="btn btn-sm p-1 m-1" v-bind:class="selected_page == page ? 'btn-dark' : 'btn-light'">{{selected_page}}</button>
-                </span>
-                <span v-else>&nbsp;&nbsp;&nbsp;</span>
-              </span>
-            </div>
-          </div>
-          <!-- END Pagination -->
+          <pagination :page="page" :pages="pages"></pagination>
 
           <!-- logs -->
           <div v-for="(log,i) in logs">
@@ -89,7 +79,12 @@
 </template>
 
 <script>
+
+  import pagination from './sub_components/pagination';
+
   export default {
+
+    components: { pagination },
 
     data() {
       return {
@@ -105,38 +100,33 @@
         users: [],
         ips: [],
 
-        total: '',
         show_trace: '',
         logs: [],
 
+        total: '',
         page: 1,
         pages: [],
       }
     },
 
     watch: {
-      type: function() { this.fetchLogs(); },
-      user: function() { this.fetchLogs(); },
-      ip: function() { this.fetchLogs(); },
+      type: function() { this.fetchData(); },
+      user: function() { this.fetchData(); },
+      ip: function() { this.fetchData(); },
     },
 
     created() {
-      this.fetchLogs();
+      this.fetchData();
     },
 
     methods: {
 
-      changePage(page) {
-        this.page = page;
-        this.fetchLogs();
-      },
-
       deleteLog(id,type) {
         axios.delete("/logs/"+id,{data: {type: type}})
-          .then(this.fetchLogs());
+          .then(this.fetchData());
       },
 
-      fetchLogs() {
+      fetchData() {
         if(!this.loading) {
           this.loading = true;
           axios.get("/logs",{params: {vue: true, type: this.type, user: this.user, ip: this.ip, page: this.page}}).then((response)=>{
@@ -148,10 +138,10 @@
             this.users = response.data.users;
             this.ips = response.data.ips;
 
-            this.total = response.data.logs.total;
             this.logs = response.data.logs.data;
 
-            this.page = response.data.page;
+            this.total = response.data.logs.total;
+            this.page = parseInt(response.data.page);
             this.pages = response.data.pages;
 
             this.loading = false;
@@ -167,4 +157,5 @@
     }
 
   };
+
 </script>

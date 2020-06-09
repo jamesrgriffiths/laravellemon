@@ -1,4 +1,4 @@
-<template>
+fetchData<template>
   <div class="row justify-content-center">
     <div class="col-md-12">
       <div class="card">
@@ -54,17 +54,7 @@
             <hr/>
 
             <!-- Pagination -->
-            <div v-if="pages.length > 1" class="row">
-              <div class="col col-12 flex-center text-center">
-                <span v-for="selected_page in pages">
-                  <span v-if="selected_page !== ''">
-                    <button type="button" v-on:click="changePage(selected_page)" class="btn btn-sm p-1 m-1" v-bind:class="selected_page == page ? 'btn-dark' : 'btn-light'">{{selected_page}}</button>
-                  </span>
-                  <span v-else>&nbsp;&nbsp;&nbsp;</span>
-                </span>
-              </div>
-            </div>
-            <!-- END Pagination -->
+            <pagination :page="page" :pages="pages"></pagination>
 
             <!-- Add User Type -->
             <div class="row mb-2">
@@ -131,7 +121,12 @@
 </template>
 
 <script>
+
+  import pagination from './sub_components/pagination';
+
   export default {
+
+    components: { pagination },
 
     data() {
       return {
@@ -150,15 +145,14 @@
 
         special_routes: [],
 
-        total: '',
-
+        total: 0,
         page: 1,
         pages: [],
       }
     },
 
     created() {
-      this.fetchUserTypes();
+      this.fetchData();
     },
 
     methods: {
@@ -167,8 +161,8 @@
       addUserType() {
         this.loading = true;
         axios.post("/user_types")
-          .then(response => { this.fetchUserTypes(); })
-          .catch(error => { this.fetchUserTypes(); });
+          .then(response => { this.fetchData(); })
+          .catch(error => { this.fetchData(); });
       },
 
       // Set the active variables for assigning routes
@@ -271,12 +265,6 @@
         }
       },
 
-      // Change the page, will refresh
-      changePage(page) {
-        this.page = page;
-        this.fetchUserTypes();
-      },
-
       // Deletes a user type in the database, updates assignable routes, only refreshes on error.
       deleteUserType(id,index) {
         this.loading = true;
@@ -291,11 +279,11 @@
         this.$delete(this.user_types,index);
         axios.delete("/user_types/"+id)
           .then(response => { this.loading = false; })
-          .catch(error => { this.fetchUserTypes(); });
+          .catch(error => { this.fetchData(); });
       },
 
       // Initial retrieval and refresh of data
-      fetchUserTypes() {
+      fetchData() {
         this.loading = true;
         axios.get("/user_types",{params: {vue: true, page: this.page}}).then((response)=>{
           this.user_types = response.data.user_types.data;
@@ -313,7 +301,7 @@
 
           this.total = response.data.user_types.total;
 
-          this.page = response.data.page;
+          this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
 
           this.loading = false;
@@ -350,10 +338,11 @@
         }
         axios.put("/user_types/"+user_type_id,{type: type, name: user_type_name, route_access: route_access})
           .then(response => { this.loading = false; })
-          .catch(error => { this.fetchUserTypes(); });
+          .catch(error => { this.fetchData(); });
       }
 
     }
 
   };
+
 </script>
