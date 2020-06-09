@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
-
+use App\Helpers\Helper;
 use App\Repositories\Facades\LogFacade;
 use App\Repositories\Facades\UserFacade;
 use App\Repositories\Facades\UserTypeFacade;
@@ -16,7 +16,7 @@ class LogController extends Controller {
     $type = $request->type ? $request->type : 0;
     $user = $request->user ? $request->user : 0;
     $ip = $request->ip ? $request->ip : 0;
-    $current_page = $request->current_page ? $request->current_page : 1;
+    $page = $request->page ? $request->page : 1;
 
     $filter_conditions = [];
     if($type !== 0) $filter_conditions['type'] = strtolower($type);
@@ -56,30 +56,6 @@ class LogController extends Controller {
     $ips[] = (object)["id" => 0, "name" => 'IP: ALL'];
     foreach(LogFacade::getIPs() as $obj_ip) { $ips[] = (object)["id" => $obj_ip->ip_address, "name" => strtoupper($obj_ip->ip_address)]; }
 
-    $pages = [];
-    $spread = 3;
-
-    $low_end = $current_page >= $spread ? $current_page - $spread : 1;
-    $high_end = $current_page + $spread <= $logs->lastPage() ? $current_page + $spread : $logs->lastPage();
-
-    if($low_end !== 1) {
-      $pages[] = 1;
-      if($low_end > 2) {
-        $pages[] = '';
-      }
-    }
-
-    for($i=$low_end;$i<=$high_end;$i++) {
-      $pages[] = $i;
-    }
-
-    if($high_end !== $logs->lastPage()) {
-      if($high_end < $logs->lastPage() - 1) {
-        $pages[] = '';
-      }
-      $pages[] = $logs->lastPage();
-    }
-
     $data = [
       "type" => $type,
       "user" => $user,
@@ -91,8 +67,8 @@ class LogController extends Controller {
 
       "logs" => $logs,
 
-      "current_page" => $current_page,
-      "pages" => $pages,
+      "page" => $page,
+      "pages" => Helper::getVisiblePages($logs->lastPage(),$page,3),
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);

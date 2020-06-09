@@ -18,6 +18,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/lemon.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -56,9 +57,9 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                   @if(Auth::user()->is_admin)
+                                    <a class="dropdown-item" href="user_types">Access Management</a>
                                     <a class="dropdown-item" href="logs">System Logs</a>
-                                    <a class="dropdown-item" href="users">Users</a>
-                                    <a class="dropdown-item" href="user_types">User Types</a>
+                                    <a class="dropdown-item" href="users">User Management</a>
                                     <hr>
                                   @endif
 
@@ -76,7 +77,7 @@
           <div class="container-fluid">
             @if (explode(".",Route::current()->getName())[0] == 'logs')<logs></logs>
             @elseif (explode(".",Route::current()->getName())[0] == 'users')<users></users>
-            @elseif (explode(".",Route::current()->getName())[0] == 'user_types')<userTypes></userTypes>
+            @elseif (explode(".",Route::current()->getName())[0] == 'user_types')<user-types></user-types>
             @else @yield('content') @endif
           </div>
         </main>

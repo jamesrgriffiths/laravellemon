@@ -11,7 +11,7 @@ class CreateUserTypesTable extends Migration {
       $table->id();
 
       $table->string('name')->nullable();
-      $table->longText('route_access')->nullable();
+      $table->longText('route_access');
 
       $table->timestamps();
       $table->softDeletes();

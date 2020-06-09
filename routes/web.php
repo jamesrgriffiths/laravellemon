@@ -18,10 +18,19 @@ Route::get('/', function () {
 });
 Auth::routes();
 
-
-Route::resource('home', 'HomeController')->middleware('auth');
+Route::resource('home', 'HomeController');
 
 // Admin only routes
-Route::resource('logs', 'LogController')->middleware('auth');
-Route::resource('users', 'UserController')->middleware('auth');
-Route::resource('user_types', 'UserTypeController')->middleware('auth');
+Route::resource('logs', 'LogController');
+Route::resource('users', 'UserController');
+Route::resource('user_types', 'UserTypeController');
+
+
+Route::resource('a', 'TestController');
+Route::resource('b', 'TestController');
+Route::resource('c', 'TestController');
+Route::resource('d', 'TestController');
+Route::resource('e', 'TestController');
+Route::resource('f', 'TestController');
+
+Route::resource('zoo_route', 'TestController');

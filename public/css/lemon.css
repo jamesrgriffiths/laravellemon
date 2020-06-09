@@ -1,0 +1,10 @@
+.lemon-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+  color: white;
+}
+.lemon-input:focus {
+  outline: none;
+}

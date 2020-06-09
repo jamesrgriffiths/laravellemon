@@ -4,47 +4,53 @@ namespace App\Http\Middleware;
 
 use Closure;
 
+use App\Repositories\Facades\UserTypeFacade;
+use App\Repositories\Facades\VariableFacade;
+
 class CheckUserAccess {
     /**
      * Handle an incoming request.
+     * See also Authenticate middleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next) {
-
       // The current top level route name
       $current_route = explode('.',$request->route()->getName())[0];
 
-      // The array of routes the given user has access to - this is built up.
-      $allowed_routes = ['','/','home','logout','login','register','password'];
+      // The routes that are available publicly
+      $accessible_routes = array_merge(VariableFacade::getValueArrayByKey('routes_protected'),VariableFacade::getValueArrayByKey('routes_public'));
 
-      // Routes that can only be accessed by administrators
-      $admin_routes = ['logs','users','user_types'];
+      // The empty route should always be accessible.
+      array_push($accessible_routes,'');
 
-      // If a user is logged in, check if they have appropriate access for the given requested route.
+      // Routes for logged in users
       if($request->user() != null) {
 
-        // If the user is an admin allow those routes
+        // Logged In Routes
+        $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByKey('routes_logged_in'));
+
+        // Admin Routes - an admin has access to all routes
         if($request->user()->is_admin) {
-          $allowed_routes = array_merge($allowed_routes,$admin_routes);
+          $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByKey('routes_admin'),VariableFacade::getSystemRoutes());
         }
 
-        // If the user has a user type allow the associated routes
+        // User Routes
         if($request->user()->userType) {
-          $allowed_routes = array_merge($allowed_routes,explode(',',$request->user()->userType->route_access));
+          $accessible_routes = array_merge($accessible_routes,explode(',',$request->user()->userType->route_access));
         }
 
-        // Direct the user if they have access
-        if(in_array($current_route,$allowed_routes)) {
-          return $next($request);
-        } else {
-          return redirect('home');
-        }
       }
 
-      // A logged out user is already restricted.
-      return $next($request);
+      // Direct the client if they have access
+      if(in_array($current_route,$accessible_routes)) {
+        return $next($request);
+      } else if($request->user() != null) {
+        return redirect('home');
+      } else {
+        return redirect('login');
+      }
     }
 }
