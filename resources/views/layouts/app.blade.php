@@ -57,9 +57,9 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                   @if(Auth::user()->is_admin)
-                                    <a class="dropdown-item" href="user_types">Access Management</a>
-                                    <a class="dropdown-item" href="logs">System Logs</a>
-                                    <a class="dropdown-item" href="users">User Management</a>
+                                    <a class="dropdown-item" href="logs">Logs</a>
+                                    <a class="dropdown-item" href="users">Users</a>
+                                    <a class="dropdown-item" href="user_types">User Types</a>
                                     <hr>
                                   @endif
 

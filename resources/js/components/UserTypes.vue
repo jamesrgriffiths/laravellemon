@@ -3,28 +3,8 @@ fetchData<template>
     <div class="col-md-12">
       <div class="card">
 
-          <!-- Header -->
-          <div class="card-header pt-0">
-            <h2 class="m-2">
-              <div class="row">
-                <div class="col col-1 p-0 mt-0">
-                  <div v-if="!loading">
-                    <svg class="bi bi-circle-fill text-success" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="8" cy="8" r="8"/>
-                    </svg>
-                  </div>
-                  <div v-if="loading" class="spinner-border text-warning" role="status">
-                    <span class="sr-only">Loading...</span>
-                  </div>
-                </div>
-                <div class="col col-10 p-0 pt-1 text-center">
-                  ACCESS MANAGEMENT<br/>
-                </div>
-                <div class="col col-1 p-0">&nbsp;</div>
-              </div>
-            </h2>
-          </div>
-          <!-- END Header -->
+        <!-- Header -->
+        <management-heading :title="title" :initialized="initialized" :loading="loading" :total="total"></management-heading>
 
           <!-- Body -->
           <div class="card-body" v-if="initialized">
@@ -122,16 +102,18 @@ fetchData<template>
 
 <script>
 
-  import pagination from './sub_components/pagination';
+  import ManagementHeading from './sub_components/ManagementHeading';
+  import Pagination from './sub_components/Pagination';
 
   export default {
 
-    components: { pagination },
+    components: { 'management-heading': ManagementHeading, 'pagination': Pagination },
 
     data() {
       return {
-        loading: false,
+        title: 'User Types',
         initialized: false,
+        loading: false,
 
         active_routes_array: [],
         active_assign_name: '',
@@ -299,8 +281,7 @@ fetchData<template>
           this.admin_routes.name = 'admin';
           this.special_routes = [this.public_routes,this.logged_in_routes,this.admin_routes];
 
-          this.total = response.data.user_types.total;
-
+          this.total = parseInt(response.data.user_types.total);
           this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
 

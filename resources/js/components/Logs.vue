@@ -4,31 +4,7 @@
       <div class="card">
 
         <!-- Header -->
-        <div class="card-header pt-0">
-          <h2 class="m-2">
-            <div class="row">
-              <div class="col col-1 p-0 mt-0">
-                <div v-if="!loading">
-                  <svg class="bi bi-circle-fill text-success" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="8" cy="8" r="8"/>
-                  </svg>
-                </div>
-                <div v-if="loading" class="spinner-border text-warning" role="status">
-                  <span class="sr-only">Loading...</span>
-                </div>
-              </div>
-              <div class="col col-10 p-0 pt-1 text-center">
-                SYSTEM LOGS: <span class="text-info">{{total}}</span><br/>
-                <div class="form-inline justify-content-center" v-if="initialized">
-                  <select class="form-control" v-model="type"><option v-for="type in types" v-bind:value="type.id">{{ type.name }}</option></select>
-                  <select class="form-control" v-model="user"><option v-for="user in users" v-bind:value="user.id">{{ user.name }}</option></select>
-                  <select class="form-control" v-model="ip"><option v-for="ip in ips" v-bind:value="ip.id">{{ ip.name }}</option></select>
-                </div>
-              </div>
-              <div class="col col-1 p-0">&nbsp;</div>
-            </div>
-          </h2>
-        </div>
+        <management-heading :title="title" :initialized="initialized" :loading="loading" :total="total" :filters="filters"></management-heading>
 
         <!-- Body -->
         <div class="card-body" v-if="initialized">
@@ -80,30 +56,29 @@
 
 <script>
 
-  import pagination from './sub_components/pagination';
+  import ManagementHeading from './sub_components/ManagementHeading';
+  import Pagination from './sub_components/Pagination';
 
   export default {
 
-    components: { pagination },
+    components: { 'management-heading': ManagementHeading, 'pagination': Pagination },
 
     data() {
       return {
-        timer: '',
-        loading: false,
+        title: 'Logs',
         initialized: false,
+        loading: false,
 
         // Filters
         type: '0',
         user: '0',
         ip: '0',
-        types: [],
-        users: [],
-        ips: [],
+        filters: [],
 
         show_trace: '',
         logs: [],
 
-        total: '',
+        total: 0,
         page: 1,
         pages: [],
       }
@@ -134,13 +109,15 @@
             this.user = response.data.user;
             this.ip = response.data.ip;
 
-            this.types = response.data.types;
-            this.users = response.data.users;
-            this.ips = response.data.ips;
+            this.filters = [
+              {'prop': 'type', 'all_values': response.data.types},
+              {'prop': 'user', 'all_values': response.data.users},
+              {'prop': 'ip', 'all_values': response.data.ips}
+            ]
 
             this.logs = response.data.logs.data;
 
-            this.total = response.data.logs.total;
+            this.total = parseInt(response.data.logs.total);
             this.page = parseInt(response.data.page);
             this.pages = response.data.pages;
 

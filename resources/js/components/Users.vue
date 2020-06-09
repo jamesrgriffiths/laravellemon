@@ -4,27 +4,7 @@
       <div class="card">
 
         <!-- Header -->
-        <div class="card-header pt-0">
-          <h2 class="m-2">
-            <div class="row">
-              <div class="col col-1 p-0 mt-0">
-                <div v-if="!loading">
-                  <svg class="bi bi-circle-fill text-success" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="8" cy="8" r="8"/>
-                  </svg>
-                </div>
-                <div v-if="loading" class="spinner-border text-warning" role="status">
-                  <span class="sr-only">Loading...</span>
-                </div>
-              </div>
-              <div class="col col-10 p-0 pt-1 text-center">
-                USER MANAGEMENT
-                <br/> <span v-if="initialized" class="text-info">Total Users: {{total}}</span><br/>
-              </div>
-              <div class="col col-1 p-0">&nbsp;</div>
-            </div>
-          </h2>
-        </div>
+        <management-heading :title="title" :initialized="initialized" :loading="loading" :total="total"></management-heading>
 
         <!-- Body -->
         <div v-if="initialized" class="card-body">
@@ -66,17 +46,18 @@
 
 <script>
 
-  import pagination from './sub_components/pagination';
+  import ManagementHeading from './sub_components/ManagementHeading';
+  import Pagination from './sub_components/Pagination';
 
   export default {
 
-    components: { pagination },
+    components: { 'management-heading': ManagementHeading, 'pagination': Pagination },
 
     data() {
       return {
-        timer: '',
-        loading: false,
+        title: 'Users',
         initialized: false,
+        loading: false,
 
         users: [],
 
@@ -102,7 +83,7 @@
         axios.get("/users",{params: {vue: true, page: this.page}}).then((response)=>{
           this.users = response.data.users.data;
 
-          this.total = response.data.users.total;
+          this.total = parseInt(response.data.users.total);
           this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
 
@@ -114,5 +95,5 @@
     }
 
   };
-  
+
 </script>

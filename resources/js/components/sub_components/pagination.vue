@@ -1,8 +1,8 @@
 <!-- Shows the pagination links on a given page
 REQUIREMENTS:
    VARIABLES:
-      page - the page number currently displayed
-      pages - the array of available page numbers
+      page - Number for the page number currently displayed.
+      pages - Array of available page numbers.
     FUNCTIONS:
       fetchData() - updates the data on the page
 -->
