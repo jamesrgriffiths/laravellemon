@@ -13,29 +13,7 @@
           <pagination :page="page" :pages="pages"></pagination>
 
           <!-- Users -->
-          <div v-for="(user,i) in users">
-            <div class="row p-2" v-bind:class="i%2 ? 'bg-light' : ''">
-              <div class="col col-12">
-                {{user.name}}
-              </div>
-              <div class="col col-12 col-md-3">
-
-              </div>
-              <div class="col col-12 col-md-3">
-
-              </div>
-              <div class="col col-12 col-md-2">
-
-              </div>
-              <div class="col col-12 col-md-1 my-auto">
-
-              </div>
-              <div class="col col-12 col-md-3 my-auto">
-                <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="deleteLog(log.id,'delete')">Delete</button>
-              </div>
-            </div>
-          </div>
-          <!-- END Users -->
+          <user-edit v-for="(user,index) in users" v-bind:key="index" :index="index" :user="user" :current_user="current_user" :user_types="user_types"></user-edit>
 
         </div>
 
@@ -48,49 +26,43 @@
 
   import ManagementHeading from './sub_components/ManagementHeading';
   import Pagination from './sub_components/Pagination';
+  import UserEdit from './sub_components/UserEdit';
 
   export default {
-
-    components: { 'management-heading': ManagementHeading, 'pagination': Pagination },
-
+    components: { 'management-heading': ManagementHeading, 'pagination': Pagination, 'user-edit': UserEdit },
     data() {
       return {
         title: 'Users',
         initialized: false,
         loading: false,
-
         users: [],
-
+        current_user: '',
+        user_types: [],
         total: 0,
         page: 1,
         pages: [],
       }
     },
-
     created() {
       this.fetchData();
     },
-
     methods: {
-
-      deleteUsers(id) {
-        axios.delete("/users/"+id)
-          .then(this.fetchData());
-      },
 
       fetchData() {
         this.loading = true;
         axios.get("/users",{params: {vue: true, page: this.page}}).then((response)=>{
           this.users = response.data.users.data;
-
+          this.current_user = response.data.current_user;
+          this.user_types = response.data.user_types;
           this.total = parseInt(response.data.users.total);
           this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
-
-          this.loading = false;
-          this.initialized = true;
+          this.$nextTick(() => {
+            this.loading = false;
+            this.initialized = true;
+          });
         });
-      }
+      },
 
     }
 

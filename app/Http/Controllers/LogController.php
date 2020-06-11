@@ -29,7 +29,7 @@ class LogController extends Controller {
     foreach($logs as $log) {
       $log->type = ucfirst($log->type);
       $log->class = substr($log->class,strrpos($log->class,"\\"));
-      $log->user = $log->user; // This enables the relationship with vue
+      $log->user = $log->user; // This enables access to the relationship with vue
 
       $log->user_type_name = "";
       if($log->user) {
