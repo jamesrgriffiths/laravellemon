@@ -4,16 +4,60 @@
       <div class="card">
 
         <!-- Header -->
-        <management-heading :title="title" :initialized="initialized" :loading="loading" :total="total"></management-heading>
+        <heading
+          :title="title"
+          :initialized="initialized"
+          :loading="loading"
+          :total="total">
+        </heading>
 
         <!-- Body -->
         <div v-if="initialized" class="card-body">
 
           <!-- Pagination -->
-          <pagination :page="page" :pages="pages"></pagination>
+          <pagination
+            :page="page"
+            :pages="pages"
+            @change="changePage">
+          </pagination>
 
           <!-- Users -->
-          <user-edit v-for="(user,index) in users" v-bind:key="index" :index="index" :user="user" :current_user="current_user" :user_types="user_types"></user-edit>
+          <div v-for="(user,index) in users" :key="user.id">
+
+            <!-- User Info -->
+            <user
+              :index="index"
+              :user="user"
+              :loading="loading"
+              :current_user="current_user"
+              :edit_modal_id="edit_modal_id+user.id"
+              :delete_modal_id="delete_modal_id+user.id">
+            </user>
+
+            <!-- User Edit Modal -->
+            <modal-edit
+              :modal_id="edit_modal_id+user.id"
+              :index="index"
+              :label="'Edit '+user.name+' (#'+user.id+')'"
+              :object="user"
+              :fields="[
+                {'name': 'name', 'display': 'Name'},
+                {'name': 'email', 'display': 'email_address'},
+                {'name': 'user_type_id', 'display': 'User Type', 'type': 'select', 'options': user_types}]"
+              :toggles="[
+                {'name': 'is_admin', 'display': 'Admin', 'disabled': user.id == current_user.id},
+                {'name': 'is_active', 'display': 'Active'}]"
+              @save="updateUser">
+            </modal-edit>
+
+            <!-- Delete Modal -->
+            <modal-delete
+              :modal_id="delete_modal_id+user.id"
+              :text="'Are you sure you want to delete user '+user.name+'(#'+user.id+')?'"
+              @delete="deleteUser(user.id,index)">
+            </modal-delete>
+
+          </div>
 
         </div>
 
@@ -24,23 +68,28 @@
 
 <script>
 
-  import ManagementHeading from './sub_components/ManagementHeading';
-  import Pagination from './sub_components/Pagination';
-  import UserEdit from './sub_components/UserEdit';
+  import Heading from './child_components/Heading';
+  import ModalDelete from './child_components/ModalDelete';
+  import ModalEdit from './child_components/ModalEdit';
+  import Pagination from './child_components/Pagination';
+  import User from './child_components/User';
 
   export default {
-    components: { 'management-heading': ManagementHeading, 'pagination': Pagination, 'user-edit': UserEdit },
+    components: { Heading, ModalDelete, ModalEdit, Pagination, User },
     data() {
       return {
         title: 'Users',
+        edit_modal_id: 'edit_modal_',
+        delete_modal_id: 'delete_modal_',
         initialized: false,
         loading: false,
-        users: [],
-        current_user: '',
-        user_types: [],
         total: 0,
         page: 1,
         pages: [],
+
+        users: [],
+        current_user: '',
+        user_types: [],
       }
     },
     created() {
@@ -48,6 +97,23 @@
     },
     methods: {
 
+      // Change the current page.
+      changePage(page) {
+        this.page = page;
+        this.fetchData();
+      },
+
+      // Deletes the user in the database, will only refresh on error.
+      deleteUser(id,index) {
+        this.loading = true;
+        this.$delete(this.users,index);
+        this.total--;
+        axios.delete("/users/"+id)
+          .then(response => { this.loading = false; })
+          .catch(error => { this.fetchData(); });
+      },
+
+      // Updates the data on the page
       fetchData() {
         this.loading = true;
         axios.get("/users",{params: {vue: true, page: this.page}}).then((response)=>{
@@ -62,6 +128,24 @@
             this.initialized = true;
           });
         });
+      },
+
+      // Updates the user in the database, will only refresh on error.
+      updateUser(updated_user,index) {
+        this.loading = true;
+        this.users[index] = updated_user;
+        axios.put('/users/'+updated_user.id,{
+          name: updated_user.name,
+          email: updated_user.email,
+          user_type_id: updated_user.user_type_id,
+          is_admin: updated_user.is_admin,
+          is_active: updated_user.is_active
+        })
+          .then(response => {
+            this.users[index].userType = response.data.userType;
+            this.loading = false;
+          })
+          .catch(error => { this.fetchData(); });
       },
 
     }

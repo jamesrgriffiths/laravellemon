@@ -6,16 +6,10 @@ use App\Repositories\RepositoryInterface;
 
 interface VariableRepositoryInterface extends RepositoryInterface {
 
-  public function getRoutesAssignable();
-
-  public function getRoutesAssigned();
-
-  public function getRoutesUnassigned();
-
-  public function getRoutesUser();
+  public function getAssignableRoutesArray($active_routes_string,$type);
 
   public function getSystemRoutes();
 
-  public function getValueArrayByKey($key);
+  public function getValueArrayByTypeAndKey($type,$key);
 
 }

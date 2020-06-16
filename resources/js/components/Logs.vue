@@ -4,48 +4,45 @@
       <div class="card">
 
         <!-- Header -->
-        <management-heading :title="title" :initialized="initialized" :loading="loading" :total="total" :filters="filters"></management-heading>
+        <heading
+          :title="title"
+          :initialized="initialized"
+          :loading="loading"
+          :total="total"
+          :filters="filters"
+          @change="changeFilter">
+        </heading>
 
         <!-- Body -->
         <div class="card-body" v-if="initialized">
 
           <!-- Pagination -->
-          <pagination :page="page" :pages="pages"></pagination>
+          <pagination
+            :page="page"
+            :pages="pages"
+            @change="changePage">
+          </pagination>
 
           <!-- logs -->
-          <div v-for="(log,i) in logs">
-            <div class="row p-2" v-bind:class="i%2 ? '' : 'bg-light'">
-              <div class="col col-12">
-                <b v-bind:class="log.type == 'Error' ? 'text-danger' : 'text-info'">{{log.type}}</b><br/>
-              </div>
-              <div class="col col-12 col-md-3">
-                <b>Time:&nbsp;</b>{{convertDateTime(log.created_at)}}<br/>
-                <b>User:&nbsp;</b>{{log.user ? log.user.name + " (" + log.user_type_name + ")" : 'None'}}<br/>
-                <b>IP:&nbsp;</b>{{log.ip_address}}
-              </div>
-              <div class="col col-12 col-md-3">
-                <b>Device:&nbsp;</b><span v-bind:title="log.device">{{log.device_cleaned}}</span><br/>
-                <b>URL:&nbsp;</b>{{log.url}}
-                <span v-if="log.type == 'Request'"><br/><b>Run Time:&nbsp;</b>{{log.run_time}}</span>
-              </div>
-              <div class="col col-12 col-md-2">
-                <b>Class:&nbsp;</b>{{log.class}}<br/>
-                <b>Message:&nbsp;</b>{{log.message}}
-              </div>
-              <div class="col col-12 col-md-1 my-auto">
-                <button v-if="log.trace" type="button" class="btn btn-sm btn-outline-info m-1" v-on:click="toggleShowTrace(log.id)">Full Trace</button>
-              </div>
-              <div class="col col-12 col-md-3 my-auto">
-                <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="deleteLog(log.id,'delete')">Delete</button>
-                <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="deleteLog(log.id,'delete_class')">Delete all by class and url</button>
-                <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="deleteLog(log.id,'delete_ip')">Delete all by IP Address</button>
-              </div>
-              <div v-if="show_trace == log.id" class="col col-12 m-3">
-                {{log.trace}}
-              </div>
-            </div>
+          <div v-for="(log,index) in logs" :key="log.id">
+
+            <!-- Log Info -->
+            <log
+              :index="index"
+              :log="log"
+              :loading="loading"
+              :trace_modal_id="trace_modal_id+log.id"
+              @delete="deleteLog">
+            </log>
+
+            <!-- Full Trace Modal -->
+            <modal-info
+              :modal_id="trace_modal_id+log.id"
+              :title="'Full Trace of Log #'+log.id"
+              :text="log.trace">
+            </modal-info>
+
           </div>
-          <!-- END Logs -->
 
         </div>
 
@@ -56,16 +53,23 @@
 
 <script>
 
-  import ManagementHeading from './sub_components/ManagementHeading';
-  import Pagination from './sub_components/Pagination';
+  import Heading from './child_components/Heading';
+  import Log from './child_components/Log';
+  import ModalInfo from './child_components/ModalInfo';
+  import Pagination from './child_components/Pagination';
 
   export default {
 
-    components: { 'management-heading': ManagementHeading, 'pagination': Pagination },
+    components: { Heading, Log, ModalInfo, Pagination },
 
     data() {
       return {
         title: 'Logs',
+        trace_modal_id: 'trace_modal_',
+
+        total: 0,
+        page: 1,
+        pages: [],
         initialized: false,
         loading: false,
 
@@ -75,32 +79,33 @@
         ip: '0',
         filters: [],
 
-        show_trace: '',
         logs: [],
-
-        total: 0,
-        page: 1,
-        pages: [],
       }
     },
-
-    watch: {
-      type: function() { this.fetchData(); },
-      user: function() { this.fetchData(); },
-      ip: function() { this.fetchData(); },
-    },
-
     created() {
       this.fetchData();
     },
-
     methods: {
 
+      // Change the filter value and refresh the page.
+      changeFilter(type,value) {
+        this[type] = value;
+        this.fetchData();
+      },
+
+      // Change the current page and refresh the page.
+      changePage(page) {
+        this.page = page;
+        this.fetchData();
+      },
+
+      // Delete a given log.
       deleteLog(id,type) {
         axios.delete("/logs/"+id,{data: {type: type}})
           .then(this.fetchData());
       },
 
+      // Get the updated logs data.
       fetchData() {
         if(!this.loading) {
           this.loading = true;
@@ -125,10 +130,6 @@
             this.initialized = true;
           });
         }
-      },
-
-      toggleShowTrace(id) {
-        this.show_trace == id ? this.show_trace = '' : this.show_trace = id;
       }
 
     }

@@ -21,7 +21,7 @@ class CheckUserAccess {
       $current_route = explode('.',$request->route()->getName())[0];
 
       // The routes that are available publicly
-      $accessible_routes = array_merge(VariableFacade::getValueArrayByKey('routes_protected'),VariableFacade::getValueArrayByKey('routes_public'));
+      $accessible_routes = array_merge(VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_protected'),VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_public'));
 
       // The empty route should always be accessible.
       array_push($accessible_routes,'');
@@ -30,11 +30,11 @@ class CheckUserAccess {
       if($request->user() != null) {
 
         // Logged In Routes
-        $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByKey('routes_logged_in'));
+        $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_logged_in'));
 
         // Admin Routes - an admin has access to all routes
         if($request->user()->is_admin) {
-          $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByKey('routes_admin'),VariableFacade::getSystemRoutes());
+          $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_admin'),VariableFacade::getSystemRoutes());
         }
 
         // User Routes

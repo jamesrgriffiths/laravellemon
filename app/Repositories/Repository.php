@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Auth;
+use DB;
 
 class Repository implements RepositoryInterface {
 
@@ -17,119 +18,28 @@ class Repository implements RepositoryInterface {
   }
 
   public function getAll($orderBy=null,$orderByDirection='asc',$take=null) {
-    if($orderBy && $take) {
-      return $this->model::orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->take($take)->get();
-    } elseif($orderBy) {
-      return $this->model::orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->get();
-    } elseif($take) {
-      return $this->model::take($take)->get();
-    } else {
-      return $this->model::get();
-    }
+    return $this->orderByAndTake($this->model::query(),$orderBy,$orderByDirection,$take)->get();
   }
 
   public function getAllPaginated($orderBy=null,$orderByDirection='asc',$number) {
-    if($orderBy) {
-      return $this->model::orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->paginate($number);
-    } else {
-      return $this->model::paginate($number);
-    }
+    return $this->orderByAndTake($this->model::query(),$orderBy,$orderByDirection,null)->paginate($number);
   }
 
   public function where($data,$orderBy=null,$orderByDirection='asc',$take=null) {
-    $collection = $this->model;
-    $counter = 0;
-    foreach($data as $key => $value) {
-      $operator = "=";
-      if(strpos($key,"::") !== false) {
-        $key_and_operator = explode("::",$key);
-        $key = $key_and_operator[0];
-        $operator = $key_and_operator[1];
-      }
-      if($counter == 0) {
-        $collection = $collection::where($key,$operator,$value);
-      } else {
-        $collection = $collection->where($key,$operator,$value);
-      }
-      $counter++;
-    }
-    if($orderBy && $take) {
-      return $collection->orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->take($take)->get();
-    } elseif($orderBy) {
-      return $collection->orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->get();
-    } elseif($take) {
-      return $collection->take($take)->get();
-    } else {
-      return $collection->get();
-    }
+    return $this->orderByAndTake($this->whereOptions($this->model::query(),$data),$orderBy,$orderByDirection,$take)->get();
   }
 
   public function wherePaginated($data,$orderBy=null,$orderByDirection='asc',$number) {
-    $collection = $this->model;
-    $counter = 0;
-    foreach($data as $key => $value) {
-      $operator = "=";
-      if(strpos($key,"::") !== false) {
-        $key_and_operator = explode("::",$key);
-        $key = $key_and_operator[0];
-        $operator = $key_and_operator[1];
-      }
-      if($counter == 0) {
-        $collection = $collection::where($key,$operator,$value);
-      } else {
-        $collection = $collection->where($key,$operator,$value);
-      }
-      $counter++;
-    }
-    if($orderBy) {
-      return $collection->orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->paginate($number);
-    } else {
-      return $collection->paginate($number);
-    }
+    return $this->orderByAndTake($this->whereOptions($this->model::query(),$data),$orderBy,$orderByDirection,null)->paginate($number);
   }
 
   public function whereFirst($data,$orderBy=null,$orderByDirection='asc') {
-    $collection = $this->model;
-    $counter = 0;
-    foreach($data as $key => $value) {
-      $operator = "=";
-      if(strpos($key,"::") !== false) {
-        $key_and_operator = explode("::",$key);
-        $key = $key_and_operator[0];
-        $operator = $key_and_operator[1];
-      }
-      if($counter == 0) {
-        $collection = $collection::where($key,$operator,$value);
-      } else {
-        $collection = $collection->where($key,$operator,$value);
-      }
-      $counter++;
-    }
-    if($orderBy) {
-      return $collection->orderBy($orderBy,$orderByDirection)->orderBy('id',$orderByDirection)->first();
-    } else {
-      return $collection->first();
-    }
+    return $this->orderByAndTake($this->whereOptions($this->model::query(),$data),$orderBy,$orderByDirection,null)->first();
   }
 
-  public function whereLast($data) {
-    $collection = $this->model;
-    $counter = 0;
-    foreach($data as $key => $value) {
-      $operator = "=";
-      if(strpos($key,"::") !== false) {
-        $key_and_operator = explode("::",$key);
-        $key = $key_and_operator[0];
-        $operator = $key_and_operator[1];
-      }
-      if($counter == 0) {
-        $collection = $collection::where($key,$operator,$value);
-      } else {
-        $collection = $collection->where($key,$operator,$value);
-      }
-      $counter++;
-    }
-    return $collection->orderBy('id','desc')->first();
+  public function whereLast($data,$orderBy=null,$orderByDirection='asc') {
+    $collection = $this->orderByAndTake($this->whereOptions($this->model::query(),$data),$orderBy,$orderByDirection,null)->get();
+    return $collection[$collection->count()-1];
   }
 
   public function store($data) {
@@ -157,6 +67,32 @@ class Repository implements RepositoryInterface {
     $object->deleted_by = Auth::check()?Auth::id():null;
     $object->save();
     $this->model::destroy($id);
+  }
+
+  // PRIVATE FUNCTIONS
+
+  private function orderByAndTake($query,$orderBy,$orderByDirection,$take) {
+    if($orderBy) {
+      foreach(explode(',',$orderBy) as $orderByItem) {
+        $query->orderBy($orderByItem,$orderByDirection);
+      }
+      $query->orderBy('id',$orderByDirection);
+    }
+    if($take) { $query->take($take); }
+    return $query;
+  }
+
+  private function whereOptions($query,$data) {
+    foreach($data as $key => $value) {
+      $operator = "=";
+      if(strpos($key,"::") !== false) {
+        $key_and_operator = explode("::",$key);
+        $key = $key_and_operator[0];
+        $operator = $key_and_operator[1];
+      }
+      $query = $query->where($key,$operator,$value);
+    }
+    return $query;
   }
 
 }

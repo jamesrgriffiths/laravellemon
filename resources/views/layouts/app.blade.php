@@ -60,6 +60,7 @@
                                     <a class="dropdown-item" href="logs">Logs</a>
                                     <a class="dropdown-item" href="users">Users</a>
                                     <a class="dropdown-item" href="user_types">User Types</a>
+                                    <a class="dropdown-item" href="variables">Variables</a>
                                     <hr>
                                   @endif
 
@@ -78,6 +79,7 @@
             @if (explode(".",Route::current()->getName())[0] == 'logs')<logs></logs>
             @elseif (explode(".",Route::current()->getName())[0] == 'users')<users></users>
             @elseif (explode(".",Route::current()->getName())[0] == 'user_types')<user-types></user-types>
+            @elseif (explode(".",Route::current()->getName())[0] == 'variables')<variables></variables>
             @else @yield('content') @endif
           </div>
         </main>

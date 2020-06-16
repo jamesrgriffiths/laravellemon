@@ -41,13 +41,15 @@ class UserController extends Controller {
     $user = UserFacade::find($id);
     $user_type_id = isset($request->user_type_id) ? $request->user_type_id : $user->user_type_id;
     $user_type_id = $user_type_id == 0 ? NULL : $user_type_id;
-    return UserFacade::update($id,[
+    $updated_user = UserFacade::update($id,[
       'name' => isset($request->name) ? $request->name : $user->name,
       'email' => isset($request->email) ? $request->email : $user->email,
       'user_type_id' => $user_type_id,
       'is_admin' => isset($request->is_admin) ? $request->is_admin : $user->is_admin,
       'is_active' => isset($request->is_active) ? $request->is_active : $user->is_active
     ]);
+    $updated_user->userType = $updated_user->userType;
+    return $updated_user;
   }
 
   public function destroy(Request $request, $id) {

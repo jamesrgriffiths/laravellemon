@@ -15,8 +15,10 @@ class CreateVariablesTable extends Migration
       Schema::create('variables', function (Blueprint $table) {
           $table->id();
 
-          $table->string('key')->unique();
-          $table->longText('value');
+          $table->string('type')->nullable();
+          $table->string('key')->nullable();
+          $table->longText('value')->nullable();
+          $table->boolean('protected')->default(0);
 
           $table->timestamps();
           $table->softDeletes();

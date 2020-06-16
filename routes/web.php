@@ -24,6 +24,7 @@ Route::resource('home', 'HomeController');
 Route::resource('logs', 'LogController');
 Route::resource('users', 'UserController');
 Route::resource('user_types', 'UserTypeController');
+Route::resource('variables', 'VariableController');
 
 
 Route::resource('a', 'TestController');

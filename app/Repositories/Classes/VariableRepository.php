@@ -13,55 +13,36 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
   // Needed for base Repository class usaage
   protected $modelClassName = 'App\Variable';
 
-  // Get all routes that are not in one of the 4 route variables
-  public function getRoutesAssignable() {
+  // Create an array of routes assignable and already assigned, ordered with an active key.
+  // $active_route_string - The comma seperated string of routes already assigned.
+  // $type - The type of route to assign, either user_type or route_access.
+  public function getAssignableRoutesArray($active_routes_string,$type) {
     $routes = [];
-    $protected_routes = $this::getValueArrayByKey('routes_protected');
-    $public_routes = $this::getValueArrayByKey('routes_public');
-    $logged_in_routes = $this::getValueArrayByKey('routes_logged_in');
-    $admin_routes = $this::getValueArrayByKey('routes_admin');
-    $special_routes = array_merge($protected_routes,$public_routes,$logged_in_routes,$admin_routes);
+    $active_routes = explode(',',$active_routes_string);
+    $unassignable_routes = array_merge(
+      $this::getValueArrayByTypeAndKey('Route Access','routes_protected'),
+      $this::getValueArrayByTypeAndKey('Route Access','routes_public'),
+      $this::getValueArrayByTypeAndKey('Route Access','routes_logged_in'),
+      $this::getValueArrayByTypeAndKey('Route Access','routes_admin') );
+
+    // Route access can not assign routes that are already assigned to users
+    if($type == 'route_access') {
+      $user_types = UserTypeFacade::getAll();
+      $user_assigned_routes = [];
+      foreach($user_types as $user_type) {
+        $user_assigned_routes = array_merge($user_assigned_routes,explode(",",$user_type->route_access));
+      }
+      $unassignable_routes = array_merge($unassignable_routes,$user_assigned_routes);
+    }
+
     foreach($this::getSystemRoutes() as $route) {
-      if (!in_array($route,$special_routes) && !in_array($route,$routes)) {
-        $routes[] = $route;
+      if(in_array($route,$active_routes)) {
+        $routes[] = (object)['active' => 1, 'name' => $route];
+      } elseif(!in_array($route,$unassignable_routes)) {
+        $routes[] = (object)['active' => 0, 'name' => $route];
       }
     }
-    return Helper::cleanArray($routes);
-  }
-
-  // Get all routes that have been assigned either to one of the 4 route
-  // variables or to at least one user type.
-  public function getRoutesAssigned() {
-    $protected_routes = $this::getValueArrayByKey('routes_protected');
-    $public_routes = $this::getValueArrayByKey('routes_public');
-    $logged_in_routes = $this::getValueArrayByKey('routes_logged_in');
-    $admin_routes = $this::getValueArrayByKey('routes_admin');
-    $user_routes = $this::getRoutesUser();
-    $assigned_routes = array_merge($protected_routes,$public_routes,$logged_in_routes,$admin_routes,$user_routes);
-    return Helper::cleanArray($assigned_routes);
-  }
-
-  // Get all routes that have not been assigned to either one of the 4 route
-  // variables or to at least one user type.
-  public function getRoutesUnassigned() {
-    $assigned_routes = $this::getRoutesAssigned();
-    $unassigned_routes = [];
-    foreach($this::getSystemRoutes() as $route) {
-      if (!in_array($route,$assigned_routes) && !in_array($route,$unassigned_routes)) {
-        $unassigned_routes[] = $route;
-      }
-    }
-    return Helper::cleanArray($unassigned_routes);
-  }
-
-  // Get all routes assigned to user types.
-  public function getRoutesUser() {
-    $routes = [];
-    $user_types = UserTypeFacade::getAll();
-    foreach($user_types as $user_type) {
-      $routes = array_merge($routes,explode(",",$user_type->route_access));
-    }
-    return Helper::cleanArray($routes);
+    return $routes;
   }
 
   // Returns an array of routes on this system by name.
@@ -73,10 +54,10 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return Helper::cleanArray($routes);
   }
 
-  // Return the value found by key in an array format, assuming comma seperation
-  // and removing blank values.
-  public function getValueArrayByKey($key) {
-    $object = $this::whereFirst(['key' => $key]);
+  // Return the value found by type and key in an array format, assuming comma
+  // seperation and removing blank values.
+  public function getValueArrayByTypeAndKey($type,$key) {
+    $object = $this::whereFirst(['type' => $type, 'key' => $key]);
     if($object) {
       $value = $object->value;
       return Helper::cleanArray(explode(",",$value));

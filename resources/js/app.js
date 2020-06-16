@@ -32,6 +32,7 @@ Vue.mixin({
 Vue.component('logs', require('./components/Logs.vue').default);
 Vue.component('users', require('./components/Users.vue').default);
 Vue.component('user-types', require('./components/UserTypes.vue').default);
+Vue.component('variables', require('./components/Variables.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
