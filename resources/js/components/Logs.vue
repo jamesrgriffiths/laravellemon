@@ -67,19 +67,19 @@
         title: 'Logs',
         trace_modal_id: 'trace_modal_',
 
+        initialized: false,
+        loading: false,
         total: 0,
         page: 1,
         pages: [],
-        initialized: false,
-        loading: false,
-
-        // Filters
-        type: '0',
-        user: '0',
-        ip: '0',
-        filters: [],
 
         logs: [],
+
+        // Filters
+        filter_type: '0',
+        filter_user: '0',
+        filter_ip: '0',
+        filters: [],
       }
     },
     created() {
@@ -109,16 +109,15 @@
       fetchData() {
         if(!this.loading) {
           this.loading = true;
-          axios.get("/logs",{params: {vue: true, type: this.type, user: this.user, ip: this.ip, page: this.page}}).then((response)=>{
-            this.type = response.data.type;
-            this.user = response.data.user;
-            this.ip = response.data.ip;
-
+          axios.get("/logs",{params: {vue: true, type: this.filter_type, user: this.filter_user, ip: this.filter_ip, page: this.page}}).then((response)=>{
+            this.filter_type = response.data.type;
+            this.filter_user = response.data.user;
+            this.filter_ip = response.data.ip;
             this.filters = [
-              {'prop': 'type', 'all_values': response.data.types},
-              {'prop': 'user', 'all_values': response.data.users},
-              {'prop': 'ip', 'all_values': response.data.ips}
-            ]
+              {'prop': 'filter_type', 'all_values': [{'id': 0, 'name': 'All Types'},{'id': 'request', 'name': 'Requests'},{'id': 'error', 'name': 'Errors'}]},
+              {'prop': 'filter_user', 'all_values': [{'id': 0, 'name': 'All Users'},{'id': -1, 'name': 'No User'}].concat(response.data.users)},
+              {'prop': 'filter_ip', 'all_values': [{'id': 0, 'name': 'All IPs'}].concat(response.data.ips)}
+            ];
 
             this.logs = response.data.logs.data;
 

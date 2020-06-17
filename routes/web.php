@@ -16,22 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::resource('home', 'HomeController');
 
-// Admin only routes
+// Primary Routes
 Route::resource('logs', 'LogController');
 Route::resource('users', 'UserController');
 Route::resource('user_types', 'UserTypeController');
 Route::resource('variables', 'VariableController');
-
-
-Route::resource('a', 'TestController');
-Route::resource('b', 'TestController');
-Route::resource('c', 'TestController');
-Route::resource('d', 'TestController');
-Route::resource('e', 'TestController');
-Route::resource('f', 'TestController');
-
-Route::resource('zoo_route', 'TestController');

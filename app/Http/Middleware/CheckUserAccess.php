@@ -32,14 +32,19 @@ class CheckUserAccess {
         // Logged In Routes
         $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_logged_in'));
 
-        // Admin Routes - an admin has access to all routes
-        if($request->user()->is_admin) {
-          $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_admin'),VariableFacade::getSystemRoutes());
-        }
+        // The email must be verified before accessing user type specific pages
+        if($request->user()->email_verified_at) {
 
-        // User Routes
-        if($request->user()->userType) {
-          $accessible_routes = array_merge($accessible_routes,explode(',',$request->user()->userType->route_access));
+          // Admin Routes - an admin has access to all routes
+          if($request->user()->is_admin) {
+            $accessible_routes = array_merge($accessible_routes,VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_admin'),VariableFacade::getSystemRoutes());
+          }
+
+          // User Routes
+          if($request->user()->userType) {
+            $accessible_routes = array_merge($accessible_routes,explode(',',$request->user()->userType->route_access));
+          }
+          
         }
 
       }

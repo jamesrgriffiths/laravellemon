@@ -8,7 +8,9 @@
           :title="title"
           :initialized="initialized"
           :loading="loading"
-          :total="total">
+          :total="total"
+          :filters="filters"
+          @change="changeFilter">
         </heading>
 
         <!-- Body -->
@@ -46,7 +48,8 @@
                 {'name': 'user_type_id', 'display': 'User Type', 'type': 'select', 'options': user_types}]"
               :toggles="[
                 {'name': 'is_admin', 'display': 'Admin', 'disabled': user.id == current_user.id},
-                {'name': 'is_active', 'display': 'Active'}]"
+                {'name': 'is_active', 'display': 'Active'},
+                {'name': 'email_verified_at', 'display': 'Verified'}]"
               @save="updateUser">
             </modal-edit>
 
@@ -81,6 +84,7 @@
         title: 'Users',
         edit_modal_id: 'edit_modal_',
         delete_modal_id: 'delete_modal_',
+
         initialized: false,
         loading: false,
         total: 0,
@@ -90,12 +94,24 @@
         users: [],
         current_user: '',
         user_types: [],
+
+        // Filters
+        filter_active: '-1',
+        filter_verified: '-1',
+        filter_user_type: '0',
+        filters: [],
       }
     },
     created() {
       this.fetchData();
     },
     methods: {
+
+      // Change the filter value and refresh the page.
+      changeFilter(type,value) {
+        this[type] = value;
+        this.fetchData();
+      },
 
       // Change the current page.
       changePage(page) {
@@ -116,7 +132,22 @@
       // Updates the data on the page
       fetchData() {
         this.loading = true;
-        axios.get("/users",{params: {vue: true, page: this.page}}).then((response)=>{
+        axios.get("/users",{params: {
+          vue: true,
+          page: this.page,
+          filter_active: this.filter_active,
+          filter_verified: this.filter_verified,
+          filter_user_type: this.filter_user_type
+        }}).then((response)=>{
+          this.filter_active = response.data.filter_active;
+          this.filter_verified = response.data.filter_verified;
+          this.filter_user_type = response.data.filter_user_type;
+          this.filters = [
+            {'prop': 'filter_active', 'all_values': [{'id': -1, 'name': 'All'},{'id': 1, 'name': 'Active'},{'id': 0, 'name': 'Inactive'}]},
+            {'prop': 'filter_verified', 'all_values': [{'id': -1, 'name': 'All'},{'id': 1, 'name': 'Verified'},{'id': 0, 'name': 'Unverified'}]},
+            {'prop': 'filter_user_type', 'all_values': [{'id': 0, 'name': 'All User Types'}].concat(response.data.user_types)}
+          ];
+
           this.users = response.data.users.data;
           this.current_user = response.data.current_user;
           this.user_types = response.data.user_types;
@@ -139,11 +170,13 @@
           email: updated_user.email,
           user_type_id: updated_user.user_type_id,
           is_admin: updated_user.is_admin,
-          is_active: updated_user.is_active
+          is_active: updated_user.is_active,
+          email_verified_at: updated_user.email_verified_at
         })
           .then(response => {
-            this.users[index].userType = response.data.userType;
-            this.loading = false;
+            this.fetchData(); // If I add something for filters I can change this back.
+            // this.users[index].userType = response.data.userType;
+            // this.loading = false;
           })
           .catch(error => { this.fetchData(); });
       },

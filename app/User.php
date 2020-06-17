@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable {
+class User extends Authenticatable implements MustVerifyEmail {
 
   use Notifiable;
   use SoftDeletes;
 
   // The attributes that are mass assignable.
-  protected $fillable = [ 'name', 'email', 'user_type_id', 'is_admin', 'is_active', 'password', 'created_by', 'updated_by', 'deleted_by' ];
+  protected $fillable = [ 'name', 'email', 'user_type_id', 'is_admin', 'is_active', 'last_logged_in', 'password', 'created_by', 'updated_by', 'deleted_by' ];
 
   // The attributes that should be hidden for arrays.
   protected $hidden = [ 'password', 'remember_token' ];

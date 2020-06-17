@@ -1992,17 +1992,17 @@ __webpack_require__.r(__webpack_exports__);
     return {
       title: 'Logs',
       trace_modal_id: 'trace_modal_',
+      initialized: false,
+      loading: false,
       total: 0,
       page: 1,
       pages: [],
-      initialized: false,
-      loading: false,
+      logs: [],
       // Filters
-      type: '0',
-      user: '0',
-      ip: '0',
-      filters: [],
-      logs: []
+      filter_type: '0',
+      filter_user: '0',
+      filter_ip: '0',
+      filters: []
     };
   },
   created: function created() {
@@ -2036,24 +2036,42 @@ __webpack_require__.r(__webpack_exports__);
         axios.get("/logs", {
           params: {
             vue: true,
-            type: this.type,
-            user: this.user,
-            ip: this.ip,
+            type: this.filter_type,
+            user: this.filter_user,
+            ip: this.filter_ip,
             page: this.page
           }
         }).then(function (response) {
-          _this.type = response.data.type;
-          _this.user = response.data.user;
-          _this.ip = response.data.ip;
+          _this.filter_type = response.data.type;
+          _this.filter_user = response.data.user;
+          _this.filter_ip = response.data.ip;
           _this.filters = [{
-            'prop': 'type',
-            'all_values': response.data.types
+            'prop': 'filter_type',
+            'all_values': [{
+              'id': 0,
+              'name': 'All Types'
+            }, {
+              'id': 'request',
+              'name': 'Requests'
+            }, {
+              'id': 'error',
+              'name': 'Errors'
+            }]
           }, {
-            'prop': 'user',
-            'all_values': response.data.users
+            'prop': 'filter_user',
+            'all_values': [{
+              'id': 0,
+              'name': 'All Users'
+            }, {
+              'id': -1,
+              'name': 'No User'
+            }].concat(response.data.users)
           }, {
-            'prop': 'ip',
-            'all_values': response.data.ips
+            'prop': 'filter_ip',
+            'all_values': [{
+              'id': 0,
+              'name': 'All IPs'
+            }].concat(response.data.ips)
           }];
           _this.logs = response.data.logs.data;
           _this.total = parseInt(response.data.logs.total);
@@ -2374,6 +2392,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -2399,13 +2420,23 @@ __webpack_require__.r(__webpack_exports__);
       pages: [],
       users: [],
       current_user: '',
-      user_types: []
+      user_types: [],
+      // Filters
+      filter_active: '-1',
+      filter_verified: '-1',
+      filter_user_type: '0',
+      filters: []
     };
   },
   created: function created() {
     this.fetchData();
   },
   methods: {
+    // Change the filter value and refresh the page.
+    changeFilter: function changeFilter(type, value) {
+      this[type] = value;
+      this.fetchData();
+    },
     // Change the current page.
     changePage: function changePage(page) {
       this.page = page;
@@ -2432,9 +2463,46 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/users", {
         params: {
           vue: true,
-          page: this.page
+          page: this.page,
+          filter_active: this.filter_active,
+          filter_verified: this.filter_verified,
+          filter_user_type: this.filter_user_type
         }
       }).then(function (response) {
+        _this2.filter_active = response.data.filter_active;
+        _this2.filter_verified = response.data.filter_verified;
+        _this2.filter_user_type = response.data.filter_user_type;
+        _this2.filters = [{
+          'prop': 'filter_active',
+          'all_values': [{
+            'id': -1,
+            'name': 'All'
+          }, {
+            'id': 1,
+            'name': 'Active'
+          }, {
+            'id': 0,
+            'name': 'Inactive'
+          }]
+        }, {
+          'prop': 'filter_verified',
+          'all_values': [{
+            'id': -1,
+            'name': 'All'
+          }, {
+            'id': 1,
+            'name': 'Verified'
+          }, {
+            'id': 0,
+            'name': 'Unverified'
+          }]
+        }, {
+          'prop': 'filter_user_type',
+          'all_values': [{
+            'id': 0,
+            'name': 'All User Types'
+          }].concat(response.data.user_types)
+        }];
         _this2.users = response.data.users.data;
         _this2.current_user = response.data.current_user;
         _this2.user_types = response.data.user_types;
@@ -2459,10 +2527,13 @@ __webpack_require__.r(__webpack_exports__);
         email: updated_user.email,
         user_type_id: updated_user.user_type_id,
         is_admin: updated_user.is_admin,
-        is_active: updated_user.is_active
+        is_active: updated_user.is_active,
+        email_verified_at: updated_user.email_verified_at
       }).then(function (response) {
-        _this3.users[index].userType = response.data.userType;
-        _this3.loading = false;
+        _this3.fetchData(); // If I add something for filters I can change this back.
+        // this.users[index].userType = response.data.userType;
+        // this.loading = false;
+
       })["catch"](function (error) {
         _this3.fetchData();
       });
@@ -3214,6 +3285,13 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -39844,8 +39922,10 @@ var render = function() {
               title: _vm.title,
               initialized: _vm.initialized,
               loading: _vm.loading,
-              total: _vm.total
-            }
+              total: _vm.total,
+              filters: _vm.filters
+            },
+            on: { change: _vm.changeFilter }
           }),
           _vm._v(" "),
           _vm.initialized
@@ -39896,7 +39976,8 @@ var render = function() {
                                 display: "Admin",
                                 disabled: user.id == _vm.current_user.id
                               },
-                              { name: "is_active", display: "Active" }
+                              { name: "is_active", display: "Active" },
+                              { name: "email_verified_at", display: "Verified" }
                             ]
                           },
                           on: { save: _vm.updateUser }
@@ -41093,59 +41174,99 @@ var render = function() {
     "div",
     { staticClass: "row p-2", class: _vm.index % 2 ? "bg-light" : "" },
     [
-      _c("div", { staticClass: "col col-12 col-md-6" }, [
-        _c(
-          "span",
-          {
-            staticClass: "font-weight-bold",
-            class:
-              _vm.user.id == _vm.current_user.id
-                ? "text-secondary"
-                : "text-info"
-          },
-          [_vm._v(_vm._s(_vm.user.name) + " (" + _vm._s(_vm.user.email) + ")")]
-        ),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.user.is_admin
-          ? _c("span", { staticClass: "text-info" }, [_vm._v("Admin")])
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.user.userType
-          ? _c("span", { staticClass: "text-info" }, [
-              _vm._v(_vm._s(_vm.user.userType.name))
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.user.is_active
-          ? _c("span", { staticClass: "text-success" }, [_vm._v("Active")])
-          : _c("span", { staticClass: "text-danger" }, [_vm._v("Inactive")]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v("User Since: "),
-        _vm.user.created_at_formatted
-          ? _c("span", { staticClass: "text-info" }, [
-              _vm._v(_vm._s(_vm.user.created_at_formatted))
-            ])
-          : _c("span", { staticClass: "text-info" }, [
-              _vm._v("Manually Created")
-            ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v("Last Login: "),
-        _vm.user.last_logged_in_formatted
-          ? _c("span", { staticClass: "text-info" }, [
-              _vm._v(_vm._s(_vm.user.last_logged_in_formatted))
-            ])
-          : _c("span", { staticClass: "text-danger" }, [_vm._v("Never")])
+      _c("div", { staticClass: "col col-12 col-md-8" }, [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col col-12 col-md-6" }, [
+            _c(
+              "span",
+              {
+                staticClass: "font-weight-bold",
+                class:
+                  _vm.user.id == _vm.current_user.id
+                    ? "text-secondary"
+                    : "text-info"
+              },
+              [
+                _vm._v(
+                  _vm._s(_vm.user.name) + " (" + _vm._s(_vm.user.email) + ")"
+                )
+              ]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col col-12 col-md-3" }, [
+            _c(
+              "span",
+              { class: _vm.user.is_active ? "text-success" : "text-danger" },
+              [_vm._v(_vm._s(_vm.user.is_active ? "Active" : "Inactive"))]
+            ),
+            _vm._v(" "),
+            _c(
+              "span",
+              {
+                class: _vm.user.email_verified_at
+                  ? "text-success"
+                  : "text-danger"
+              },
+              [
+                _vm._v(
+                  _vm._s(_vm.user.email_verified_at ? "Verified" : "Unverified")
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "span",
+              {
+                class:
+                  !_vm.user.is_admin && !_vm.user.userType
+                    ? "text-danger"
+                    : "text-info"
+              },
+              [
+                _vm._v(
+                  "\n          " +
+                    _vm._s(
+                      _vm.user.is_admin
+                        ? "Admin"
+                        : _vm.user.userType
+                        ? _vm.user.userType.name
+                        : "No User Type"
+                    ) +
+                    "\n        "
+                )
+              ]
+            )
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "col col-12 col-md-3",
+              class: _vm.user.last_logged_in_formatted
+                ? "text-info"
+                : "text-danger"
+            },
+            [
+              _vm._v(
+                "\n        " +
+                  _vm._s(
+                    _vm.user.last_logged_in_formatted
+                      ? _vm.user.last_logged_in_formatted
+                      : "Never Logged In"
+                  ) +
+                  "\n      "
+              )
+            ]
+          )
+        ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-12 col-md-6 my-auto text-right" }, [
+      _c("div", { staticClass: "col col-12 col-md-4 my-auto text-right" }, [
         _c(
           "button",
           {
-            staticClass: "btn btn-sm btn-outline-info",
+            staticClass: "btn btn-sm btn-outline-info m-1",
             attrs: {
               type: "button",
               "data-toggle": "modal",
@@ -41159,7 +41280,7 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "btn btn-sm btn-outline-danger",
+            staticClass: "btn btn-sm btn-outline-danger m-1",
             attrs: {
               type: "button",
               "data-toggle": "modal",

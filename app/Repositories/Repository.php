@@ -82,6 +82,8 @@ class Repository implements RepositoryInterface {
     return $query;
   }
 
+  // $query - the query being built up
+  // $data = [[$key_1::$operator_1 => $value_1],...[$key_n::$operator_n => $value_n]]
   private function whereOptions($query,$data) {
     foreach($data as $key => $value) {
       $operator = "=";
@@ -90,7 +92,17 @@ class Repository implements RepositoryInterface {
         $key = $key_and_operator[0];
         $operator = $key_and_operator[1];
       }
-      $query = $query->where($key,$operator,$value);
+      switch ($operator) {
+        case 'null':
+          $query = $query->whereNull($key);
+          break;
+        case 'notnull':
+          $query = $query->whereNotNull($key);
+          break;
+        default:
+          $query = $query->where($key,$operator,$value);
+          break;
+      }
     }
     return $query;
   }
