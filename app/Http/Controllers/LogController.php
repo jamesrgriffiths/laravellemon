@@ -8,6 +8,7 @@ use App\Helpers\Helper;
 use App\Repositories\Facades\LogFacade;
 use App\Repositories\Facades\UserFacade;
 use App\Repositories\Facades\UserTypeFacade;
+use App\Repositories\Facades\VariableFacade;
 
 class LogController extends Controller {
 
@@ -59,7 +60,7 @@ class LogController extends Controller {
       "logs" => $logs,
 
       "page" => $page,
-      "pages" => Helper::getVisiblePages($logs->lastPage(),$page,3),
+      "pages" => Helper::getVisiblePages($logs->lastPage(),$page,3)
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);

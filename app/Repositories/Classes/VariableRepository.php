@@ -4,8 +4,11 @@ namespace App\Repositories\Classes;
 
 use App\Helpers\Helper;
 use App\Repositories\Repository;
+use App\Repositories\Facades\UserFacade;
 use App\Repositories\Facades\UserTypeFacade;
 use App\Repositories\Interfaces\VariableRepositoryInterface;
+use Config;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class VariableRepository extends Repository implements VariableRepositoryInterface {
@@ -45,8 +48,44 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return $routes;
   }
 
-  // Returns an array of routes on this system by name.
+  public function getLoggedInUserRoutes($user_id) {
+    $user = UserFacade::find($user_id);
+
+    // Logged In Routes
+    $accessible_routes = $this::getValueArrayByTypeAndKey('Route Access','routes_logged_in');
+
+    // The email must be verified before accessing user type specific pages
+    if($user->email_verified_at) {
+
+      // Admin Routes
+      if($user->is_admin) {
+        $accessible_routes = array_merge($accessible_routes,$this::getValueArrayByTypeAndKey('Route Access','routes_admin'),$this::getSystemRoutes());
+      }
+
+      // User Routes
+      if($user->userType) {
+        $accessible_routes = array_merge($accessible_routes,explode(',',$user->userType->route_access));
+      }
+
+    }
+
+    return Helper::cleanArray($accessible_routes);
+  }
+
+  // Returns an array of routes on this system by name. - Does not include protected routes.
   public function getSystemRoutes() {
+    $routes = [];
+    $protected_routes = $this::getValueArrayByTypeAndKey('Route Access','routes_protected');
+    foreach($this::getAllSystemRoutes() as $route) {
+      if(!in_array($route,$protected_routes)) {
+        $routes[] = $route;
+      }
+    }
+    return Helper::cleanArray($routes);
+  }
+
+  // Returns an array of routes on this system by name. - Includes protected routes.
+  public function getAllSystemRoutes() {
     $routes = [];
     foreach(Route::getRoutes() as $route) {
       $routes[] = explode('.',$route->getName())[0];

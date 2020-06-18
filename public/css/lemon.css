@@ -1,10 +1,57 @@
-.lemon-input {
+.lemon-dropdown-name {
+  display: block;
   width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid white;
-  color: white;
+  text-align: center;
+  font-size: 16px;
 }
-.lemon-input:focus {
-  outline: none;
+
+.lemon-link {
+  color: var(--secondary);
+  padding: 0 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size 12px;
+  font-weight: bold;
+  letter-spacing: .1rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.lemon-link:hover {
+  text-decoration: none;
+  color: var(--dark);
+}
+
+.lemon-nav-left {
+  position: absolute;
+  left: 10px;
+  top: 20px;
+}
+
+.lemon-nav-right {
+  position: absolute;
+  right: 10px;
+  top: 20px;
+}
+
+.lemon-title {
+  color: #636b6f;
+  font-family: 'Nunito', sans-serif;
+  font-size: 92px;
+}
+
+.lemon-title-nav {
+  color: #636b6f;
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  padding: 0px;
+  margin: 0px;
+  margin-top: 3px;
+}
+
+.lemon-welcome {
+  align-items: center;
+  position: absolute;
+  width: 100vw;
+  top: 40vh;
+  justify-content: center;
+  text-align: center;
 }

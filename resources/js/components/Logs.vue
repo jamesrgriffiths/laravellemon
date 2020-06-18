@@ -1,6 +1,8 @@
 <template>
-  <div class="row justify-content-center">
-    <div class="col-md-12">
+  <div>
+
+    <!-- Content -->
+    <div class="container-fluid mt-3">
       <div class="card">
 
         <!-- Header -->
@@ -48,6 +50,7 @@
 
       </div>
     </div>
+
   </div>
 </template>
 

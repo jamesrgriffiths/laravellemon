@@ -8,7 +8,11 @@ interface VariableRepositoryInterface extends RepositoryInterface {
 
   public function getAssignableRoutesArray($active_routes_string,$type);
 
+  public function getLoggedInUserRoutes($user_id);
+
   public function getSystemRoutes();
+
+  public function getAllSystemRoutes();
 
   public function getValueArrayByTypeAndKey($type,$key);
 

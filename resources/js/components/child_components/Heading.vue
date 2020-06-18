@@ -24,9 +24,9 @@
         </div>
         <div class="col col-10 p-0 pt-1 text-center">
           {{title}}
-          <br/>
-          <small v-if="initialized" class="text-info h5">Total {{title}}: {{total}}</small>
-          <br/>
+          <div v-if="total">
+            <small v-if="initialized" class="text-info h5">Total {{title}}: {{total}}</small>
+          </div>
           <div class="form-inline justify-content-center" v-if="initialized && filters">
             <select v-for="filter in filters" class="form-control" v-on:change="$emit('change',filter.prop,$event.target.value)">
               <option v-for="value in filter.all_values" v-bind:value="value.id">{{value.name}}</option>
