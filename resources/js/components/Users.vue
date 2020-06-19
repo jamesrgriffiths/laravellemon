@@ -174,9 +174,7 @@
           email_verified_at: updated_user.email_verified_at
         })
           .then(response => {
-            this.fetchData(); // If I add something for filters I can change this back.
-            // this.users[index].userType = response.data.userType;
-            // this.loading = false;
+            this.fetchData();
           })
           .catch(error => { this.fetchData(); });
       },

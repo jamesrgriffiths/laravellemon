@@ -34,8 +34,11 @@
 
             @auth
               <div class="lemon-dropdown-name">{{Auth::user()->name}}</div>
-              <div class="dropdown-divider"></div>
             @endauth
+
+            @if(session('public_routes'))
+              <div class="dropdown-divider"></div>
+            @endif
 
             @foreach(session('public_routes') as $public_route)
               <a class="dropdown-item btn text-capitalize" href="{{$public_route}}">{{str_replace("_"," ",$public_route)}}</a>
