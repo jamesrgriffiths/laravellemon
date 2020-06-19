@@ -103,35 +103,39 @@
       },
 
       // Delete a given log.
-      deleteLog(id,type) {
-        axios.delete("/logs/"+id,{data: {type: type}})
-          .then(this.fetchData());
+      deleteLog(id,index) {
+        this.loading = true;
+        this.$delete(this.logs,index);
+        this.total--;
+        axios.delete("/logs/"+id)
+          .then(response => { this.loading = false; })
+          .catch(error => { this.fetchData(); });
       },
 
       // Get the updated logs data.
       fetchData() {
-        if(!this.loading) {
-          this.loading = true;
-          axios.get("/logs",{params: {vue: true, type: this.filter_type, user: this.filter_user, ip: this.filter_ip, page: this.page}}).then((response)=>{
-            this.filter_type = response.data.type;
-            this.filter_user = response.data.user;
-            this.filter_ip = response.data.ip;
-            this.filters = [
-              {'prop': 'filter_type', 'all_values': [{'id': 0, 'name': 'All Types'},{'id': 'request', 'name': 'Requests'},{'id': 'error', 'name': 'Errors'}]},
-              {'prop': 'filter_user', 'all_values': [{'id': 0, 'name': 'All Users'},{'id': -1, 'name': 'No User'}].concat(response.data.users)},
-              {'prop': 'filter_ip', 'all_values': [{'id': 0, 'name': 'All IPs'}].concat(response.data.ips)}
-            ];
+        this.loading = true;
+        axios.get("/logs",{params: {vue: true, filter_type: this.filter_type, filter_user: this.filter_user, filter_ip: this.filter_ip, page: this.page}}).then((response)=>{
+          this.filter_type = response.data.filter_type;
+          this.filter_user = response.data.filter_user;
+          this.filter_ip = response.data.filter_ip;
+          this.filters = [
+            {'prop': 'filter_type', 'all_values': [{'id': 0, 'name': 'All Types'},{'id': 'request', 'name': 'Requests'},{'id': 'error', 'name': 'Errors'}]},
+            {'prop': 'filter_user', 'all_values': [{'id': 0, 'name': 'All Users'},{'id': -1, 'name': 'No User'}].concat(response.data.users)},
+            {'prop': 'filter_ip', 'all_values': [{'id': 0, 'name': 'All IPs'}].concat(response.data.ips)}
+          ];
 
-            this.logs = response.data.logs.data;
+          this.logs = response.data.logs.data;
 
-            this.total = parseInt(response.data.logs.total);
-            this.page = parseInt(response.data.page);
-            this.pages = response.data.pages;
+          this.total = parseInt(response.data.logs.total);
+          this.page = parseInt(response.data.page);
+          this.pages = response.data.pages;
 
+          this.$nextTick(() => {
             this.loading = false;
             this.initialized = true;
           });
-        }
+        });
       }
 
     }

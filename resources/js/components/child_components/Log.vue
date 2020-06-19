@@ -20,17 +20,13 @@
       <b>URL:&nbsp;</b>{{log.url}}
       <span v-if="log.type == 'Request'"><br/><b>Run Time:&nbsp;</b>{{log.run_time}}</span>
     </div>
-    <div class="col col-12 col-md-2">
+    <div class="col col-12 col-md-3">
       <b>Class:&nbsp;</b>{{log.class}}<br/>
       <b>Message:&nbsp;</b>{{log.message}}
     </div>
-    <div class="col col-12 col-md-1 my-auto">
+    <div class="col col-12 col-md-3 my-auto text-right">
       <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" :data-target="'#'+trace_modal_id">Full Trace</button>
-    </div>
-    <div class="col col-12 col-md-3 my-auto">
-      <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="$emit('delete',log.id,'delete')" :disabled="loading">Delete</button>
-      <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="$emit('delete',log.id,'delete_class')" :disabled="loading">Delete all by class and url</button>
-      <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="$emit('delete',log.id,'delete_ip')" :disabled="loading">Delete all by IP Address</button>
+      <button type="button" class="btn btn-sm btn-outline-danger m-1" v-on:click="$emit('delete',log.id,index)" :disabled="loading">Delete</button>
     </div>
   </div>
 </template>

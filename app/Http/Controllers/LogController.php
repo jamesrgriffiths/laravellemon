@@ -14,16 +14,17 @@ class LogController extends Controller {
 
   // View Logs
   public function index(Request $request) {
-    $type = $request->type ? $request->type : 0;
-    $user = $request->user ? $request->user : 0;
-    $ip = $request->ip ? $request->ip : 0;
     $page = $request->page ? $request->page : 1;
 
+    // filters
+    $filter_type = isset($request->filter_type) ? $request->filter_type : 0;
+    $filter_user = isset($request->filter_user) ? $request->filter_user : 0;
+    $filter_ip = isset($request->filter_ip) ? $request->filter_ip : 0;
     $filter_conditions = [];
-    if($type !== 0) $filter_conditions['type'] = strtolower($type);
-    if($user !== 0 && $user !== -1) $filter_conditions['user_id'] = $user;
-    if($user == -1) $filter_conditions['user_id'] = NULL;
-    if($ip !== 0) $filter_conditions['ip_address'] = $ip;
+    if($filter_type) { $filter_conditions['type'] = $filter_type; }
+    if($filter_user != 0 && $filter_user != -1) { $filter_conditions['user_id'] = $filter_user; }
+    if($filter_user == -1) { $filter_conditions['user_id::null'] = ''; }
+    if($filter_ip) { $filter_conditions['ip_address'] = $filter_ip; }
 
     $logs = $filter_conditions ? LogFacade::wherePaginated($filter_conditions,'id','DESC',25) : LogFacade::getAllPaginated('id','DESC',25);
 
@@ -50,9 +51,9 @@ class LogController extends Controller {
     foreach($ips as $ip) { $ip->name = $ip->ip_address; }
 
     $data = [
-      "type" => $type,
-      "user" => $user,
-      "ip" => $ip,
+      "filter_type" => $filter_type,
+      "filter_user" => $filter_user,
+      "filter_ip" => $filter_ip,
 
       "users" => UserFacade::getAll('name'),
       "ips" => $ips,
@@ -68,21 +69,7 @@ class LogController extends Controller {
 
   // Delete a log or logs
   public function destroy(Request $request, $id) {
-    $current_log = LogFacade::find($id);
-    if($request->type == 'delete') {
-      LogFacade::delete($id);
-    } elseif($request->type == 'delete_class') {
-      $logs = LogFacade::where(['class' => $current_log->class, 'message' => $current_log->message, 'url' => $current_log->url],'id','ASC');
-      foreach($logs as $log) {
-        LogFacade::delete($log->id);
-      }
-    } elseif($request->type == 'delete_ip') {
-      $logs = LogFacade::where(['ip_address' => $current_log->ip_address],'id','ASC');
-      foreach($logs as $log) {
-        LogFacade::delete($log->id);
-      }
-    }
-    return 1;
+    return LogFacade::delete($id);
   }
 
 }
