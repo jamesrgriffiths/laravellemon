@@ -3,8 +3,8 @@
    index - The index of the object in the array the object is a part of.
    label - The name to use for labelling this modal.
    object - The object.
-   fields - (OPTIONAL) An array of fields (name, display, type (select, DEFAULT input), options (required for select type, expects an object with id and name)) to update.
-   toggles - (OPTIONAL) An array of fields (name, display, disabled - DEFAULT FALSE) to update via toggles or buttons.
+   fields - (OPTIONAL) An array of fields (name, display, type (select, DEFAULT input), options (required for select type, expects an object with id and name), invisible - DEFAULT FALSE) to update.
+   toggles - (OPTIONAL) An array of fields (name, display, disabled - DEFAULT FALSE, invisible - DEFAULT FALSE) to update via toggles or buttons.
    - emit 'save' - sends back updated object and index
  -->
 <template>
@@ -15,7 +15,7 @@
           <h5 class="modal-title text-info" id="modalLabel">{{label}}</h5>
         </div>
         <div class="modal-body">
-          <div v-if="fields" v-for="field in fields" class="row mb-1">
+          <div v-if="fields && !field.invisible" v-for="field in fields" class="row mb-1">
             <div class="col col-3 my-auto h6">{{field.display}}</div>
             <div class="col col-9">
               <select v-if="field.type == 'select'" v-model="working_object[field.name]" class="form-control">
@@ -28,7 +28,7 @@
           <div v-if="toggles">
             <div class="row mb-1">
               <div class="col col-12">
-                <button v-for="toggle in toggles" v-on:click="working_object[toggle.name] = !working_object[toggle.name]" type="button"
+                <button v-if="!toggle.invisible" v-for="toggle in toggles" v-on:click="working_object[toggle.name] = !working_object[toggle.name]" type="button"
                   class="btn btn-sm m-1" :class="working_object[toggle.name] ? 'btn-primary' : 'btn-outline-secondary'"
                   :disabled="toggle.disabled">{{toggle.display}}</button>
               </div>

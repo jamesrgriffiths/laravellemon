@@ -31,6 +31,7 @@ Vue.mixin({
 
 Vue.component('home', require('./components/Home.vue').default);
 Vue.component('logs', require('./components/Logs.vue').default);
+Vue.component('organizations', require('./components/Organizations.vue').default);
 Vue.component('users', require('./components/Users.vue').default);
 Vue.component('user-types', require('./components/UserTypes.vue').default);
 Vue.component('variables', require('./components/Variables.vue').default);

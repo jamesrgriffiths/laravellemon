@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helper;
+use App\Repositories\Facades\OrganizationFacade;
 use App\Repositories\Facades\UserFacade;
 use App\Repositories\Facades\UserTypeFacade;
 use Carbon\Carbon;
@@ -29,11 +30,15 @@ class UserController extends Controller {
     }
     if($filter_user_type != 0) { $filter_conditions['user_type_id'] = $filter_user_type; }
 
-    $users = $filter_conditions ? UserFacade::wherePaginated($filter_conditions,'name','DESC',25) : UserFacade::getAllPaginated('name','DESC',25);
+    // Filter organization if there is one
+    if(session('organization')) { $filter_conditions['organization_id'] = session('organization')->id; }
+
+    $users = $filter_conditions ? UserFacade::wherePaginated($filter_conditions,'name','ASC',25) : UserFacade::getAllPaginated('name','ASC',25);
     $current_user = UserFacade::find(auth()->user()->id);
 
     foreach($users as $user) {
       $user->userType = $user->userType; // This enables access to the relationship with vue
+      $user->organization = $user->organization; // This enables access to the relationship with vue
       $user->created_at_formatted = $user->created_at ? $user->created_at->format('F d, Y') : '';
       $user->last_logged_in_formatted = $user->last_logged_in ? $user->last_logged_in->format('F d, Y g:i A') : '';
     }
@@ -44,7 +49,9 @@ class UserController extends Controller {
       "filter_active" => $filter_active,
       'users' => $users,
       'current_user' => $current_user,
-      'user_types' => UserTypeFacade::getAll('name')
+      'user_types' => UserTypeFacade::getAll('name'),
+      'active_organization' => session('organization'),
+      'organizations' => OrganizationFacade::getAll('name')
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);
@@ -56,6 +63,10 @@ class UserController extends Controller {
 
   public function update(Request $request, $id) {
     $user = UserFacade::find($id);
+
+    $organization_id = isset($request->organization_id) ? $request->organization_id : $user->organization_id;
+    $organization_id = $organization_id == 0 ? NULL : $organization_id;
+
     $user_type_id = isset($request->user_type_id) ? $request->user_type_id : $user->user_type_id;
     $user_type_id = $user_type_id == 0 ? NULL : $user_type_id;
 
@@ -67,6 +78,7 @@ class UserController extends Controller {
     $updated_user = UserFacade::update($id,[
       'name' => isset($request->name) ? $request->name : $user->name,
       'email' => isset($request->email) ? $request->email : $user->email,
+      'organization_id' => $organization_id,
       'user_type_id' => $user_type_id,
       'is_admin' => isset($request->is_admin) ? $request->is_admin : $user->is_admin,
       'is_active' => isset($request->is_active) ? $request->is_active : $user->is_active,

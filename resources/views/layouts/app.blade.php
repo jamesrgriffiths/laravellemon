@@ -57,9 +57,14 @@
           </div>
         </div>
 
-        <!-- Don't show the title on the welcome page - it will be displayed somewhere else -->
+        <!-- Don't show the nav title on the welcome page -->
         @if(!in_array(explode(".",Route::current()->getName())[0],['','/']))
-          <a class="navbar-brand mr-auto lemon-title-nav" href="\">{{config('app.name')}}</a>
+          <a class="navbar-brand mr-auto lemon-title-nav" href="\">
+            {{config('app.name')}}
+            @if(session('organization'))
+              - {{session('organization')->name}}
+            @endif
+          </a>
         @endif
 
         <!-- Allow login and register if the user is not logged in -->
@@ -75,7 +80,12 @@
       <!-- Welcome page -->
       @if(in_array(explode(".",Route::current()->getName())[0],['','/']))
         <div class="lemon-welcome">
-            <div class="lemon-title">{{config('app.name')}}</div>
+            <div class="lemon-title">
+              {{config('app.name')}}
+              @if(session('organization'))
+                <br/><h3>{{session('organization')->name}}</h3>
+              @endif
+            </div>
             <br/>
             <br/>
             <a class="lemon-link" href="https://jamesgriffithsdevelopment.com">Website</a>
@@ -85,6 +95,7 @@
       <!-- All other pages - add vue templates if they exist otherwise it will yeild content -->
       @elseif (explode(".",Route::current()->getName())[0] == 'home')<home></home>
       @elseif (explode(".",Route::current()->getName())[0] == 'logs')<logs></logs>
+      @elseif (explode(".",Route::current()->getName())[0] == 'organizations')<organizations></organizations>
       @elseif (explode(".",Route::current()->getName())[0] == 'users')<users></users>
       @elseif (explode(".",Route::current()->getName())[0] == 'user_types')<user-types></user-types>
       @elseif (explode(".",Route::current()->getName())[0] == 'variables')<variables></variables>

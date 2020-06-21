@@ -12,7 +12,7 @@
     </div>
     <div class="col col-12 col-md-3">
       <b>Time:&nbsp;</b>{{convertDateTime(log.created_at)}}<br/>
-      <b>User:&nbsp;</b>{{log.user ? log.user.name + " (" + log.user_type_name + ")" : 'None'}}<br/>
+      <b>User:&nbsp;</b>{{log.user ? log.user.name + " - " + log.organization_name + " " + log.user_type_name : 'None'}}<br/>
       <b>IP:&nbsp;</b>{{log.ip_address}}
     </div>
     <div class="col col-12 col-md-3">

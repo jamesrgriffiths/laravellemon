@@ -15,6 +15,9 @@ class CreateVariablesTable extends Migration
       Schema::create('variables', function (Blueprint $table) {
           $table->id();
 
+          $table->bigInteger('organization_id')->unsigned()->nullable();
+          $table->foreign('organization_id')->references('id')->on('organizations');
+
           $table->string('type')->nullable();
           $table->string('key')->nullable();
           $table->longText('value')->nullable();

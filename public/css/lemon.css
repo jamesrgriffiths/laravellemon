@@ -5,6 +5,33 @@
   font-size: 16px;
 }
 
+.lemon-form {
+  position: relative;
+  display: inline-block;
+  width: 450px;
+  padding: 5px;
+  margin: auto;
+}
+
+.lemon-form-container {
+  position: absolute;
+  display: flex;
+  width: 100vw;
+  padding-top: 50px;
+}
+
+.lemon-form-title {
+  position: relative;
+  display: inline-block;
+  width: 450px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #636b6f;
+  font-family: 'Nunito', sans-serif;
+  font-size: 32px;
+  border-bottom: thin solid var(--secondary);
+}
+
 .lemon-link {
   color: var(--secondary);
   padding: 0 10px;

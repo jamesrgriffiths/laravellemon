@@ -36,11 +36,13 @@ class LogController extends Controller {
       $log->user_type_name = "";
       if($log->user) {
         if($log->user->is_admin) {
-          $log->user_type_name = "ADMIN";
+          $log->user_type_name = "Admin";
         } else if($log->user->userType) {
-          $log->user_type_name = strtoupper($log->user->userType->name);
+          $log->user_type_name = $log->user->userType->name;
         }
       }
+
+      $log->organization_name = $log->user && $log->user->organization_id ? $log->user->organization->name : '';
 
       $agent = new Agent();
       $agent->setUserAgent($log->device);

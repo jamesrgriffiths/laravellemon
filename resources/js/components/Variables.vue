@@ -28,7 +28,8 @@
               :fields="[
                 {'name': 'type', 'display': 'Type'},
                 {'name': 'key', 'display': 'Key'},
-                {'name': 'value', 'display': 'Value'}]"
+                {'name': 'value', 'display': 'Value'},
+                {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization}]"
               @save="createVariable">
             </modal-create>
 
@@ -57,7 +58,9 @@
                 :index="index"
                 :label="'Edit '+variable.type+' - '+variable.key"
                 :object="variable"
-                :fields="[{'name': 'value', 'display': 'Value'}]"
+                :fields="[
+                  {'name': 'value', 'display': 'Value'},
+                  {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization}]"
                 @save="updateVariable">
               </modal-edit>
 
@@ -98,8 +101,11 @@
         delete_modal_id: 'modal_delete_',
         initialized: false,
         loading: false,
-        variables: [],
         total: 0,
+
+        variables: [],
+        organizations: [],
+        active_organization: []
       }
     },
 
@@ -112,7 +118,11 @@
       // Creates a new variable
       createVariable(obj) {
         this.loading = true;
-        axios.post("/variables",{type: obj.type, key: obj.key, value: obj.value})
+        axios.post("/variables",{
+          type: obj.type,
+          key: obj.key,
+          value: obj.value,
+          organization_id: this.active_organization ? this.active_organization.id : obj.organization_id})
           .then(response => { this.fetchData(); })
           .catch(error => { this.fetchData(); });
       },
@@ -132,6 +142,8 @@
         this.loading = true;
         axios.get("/variables",{params: {vue: true}}).then((response)=>{
           this.variables = response.data.variables;
+          this.organizations = response.data.organizations;
+          this.active_organization = response.data.active_organization;
           this.total = parseInt(this.variables.length);
           this.loading = false;
           this.initialized = true;
@@ -142,9 +154,10 @@
         this.loading = true;
         this.variables[index] = updated_variable;
         axios.put('/variables/'+updated_variable.id,{
-          value: updated_variable.value
+          value: updated_variable.value,
+          organization_id: this.active_organization ? this.active_organization.id : updated_variable.organization_id
         })
-          .then(response => { this.loading = false; })
+          .then(response => { this.fetchData(); })
           .catch(error => { this.fetchData(); });
       },
 

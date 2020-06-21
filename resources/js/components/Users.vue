@@ -44,7 +44,8 @@
               :object="user"
               :fields="[
                 {'name': 'name', 'display': 'Name'},
-                {'name': 'email', 'display': 'email_address'},
+                {'name': 'email', 'display': 'E-Mail'},
+                {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization},
                 {'name': 'user_type_id', 'display': 'User Type', 'type': 'select', 'options': user_types}]"
               :toggles="[
                 {'name': 'is_admin', 'display': 'Admin', 'disabled': user.id == current_user.id},
@@ -94,6 +95,8 @@
         users: [],
         current_user: '',
         user_types: [],
+        active_organization: '',
+        organizations: [],
 
         // Filters
         filter_active: '-1',
@@ -151,6 +154,8 @@
           this.users = response.data.users.data;
           this.current_user = response.data.current_user;
           this.user_types = response.data.user_types;
+          this.active_organization = response.data.active_organization;
+          this.organizations = response.data.organizations;
           this.total = parseInt(response.data.users.total);
           this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
@@ -168,6 +173,7 @@
         axios.put('/users/'+updated_user.id,{
           name: updated_user.name,
           email: updated_user.email,
+          organization_id: updated_user.organization_id,
           user_type_id: updated_user.user_type_id,
           is_admin: updated_user.is_admin,
           is_active: updated_user.is_active,

@@ -15,12 +15,14 @@
         <!-- Body -->
         <div class="card-body text-center" v-if="initialized">
           <h5>Welcome {{user.name}}</h5>
-          <div v-if="!user.email_verified_at && !verification_sent" class="h6">
-            Your email has not been verified, you may not have full access to all features.
-            <button type="button" class="btn btn-sm btn-outline-info" :click="resendVerificationEmail(user.id)">Resend Verification Email</button>
-          </div>
-          <div v-if="!user.email_verified_at && verification_sent" class="h6">
-            Verification Email Sent.
+          <div v-if="!user.email_verified_at">
+            <div v-if="!verification_sent" class="h6">
+              Your email has not been verified, you may not have full access to all features.
+              <button type="button" class="btn btn-sm btn-outline-info" @click="resendVerificationEmail(user.id)">Resend Verification Email</button>
+            </div>
+            <div v-if="verification_sent" class="h6">
+              Verification Email Sent.
+            </div>
           </div>
         </div>
 

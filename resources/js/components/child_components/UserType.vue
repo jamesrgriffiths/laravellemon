@@ -8,7 +8,10 @@
 -->
 <template>
   <div class="row p-2" v-bind:class="index%2 ? '' : 'bg-light'">
-    <div class="col col-12 col-md-3 h5">{{user_type.name}}: <small class="text-info ">{{user_type.user_count}} users</small></div>
+    <div class="col col-12 col-md-3">
+      <span class="font-weight-bold text-info h5">{{user_type.name}}</span>
+      <span class="text-secondary h6">&nbsp;({{user_type.user_count}} {{user_type.user_count == 1 ? 'User' : 'Users'}})</span>
+    </div>
     <div class="col col-12 col-md-6">
       <button type="button" v-for="route in user_type.routes" v-if="route.active == 1" class="btn btn-sm btn-info m-1" disabled>{{route.name}} </button>
     </div>
