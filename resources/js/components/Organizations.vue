@@ -42,7 +42,7 @@
           <div v-for="(organization,index) in organizations" :key="organization.id">
 
             <!-- Organization Info -->
-            <show-item
+            <show-item :key="update_counter"
               :index="index"
               :loading="loading"
               :label="organization.name"
@@ -108,6 +108,7 @@
         total: 0,
         page: 1,
         pages: [],
+        update_counter: 0,
 
         organizations: [],
         active_organization: ''
@@ -128,6 +129,7 @@
       createOrganization(obj) {
         this.loading = true;
         axios.post("/organizations",{
+          vue: true,
           name: obj.name,
           slug: obj.slug
         }).then(response => { this.fetchData(); }).catch(error => { this.fetchData(); });
@@ -138,7 +140,7 @@
         this.loading = true;
         this.$delete(this.organizations,index);
         this.total--;
-        axios.delete("/organizations/"+id)
+        axios.delete("/organizations/"+id,{params: {vue: true}})
           .then(response => { this.loading = false; })
           .catch(error => { this.fetchData(); });
       },
@@ -163,6 +165,7 @@
       updateOrganization(updated_organization,index) {
         this.loading = true;
         this.organizations[index] = updated_organization;
+        this.update_counter++;
         axios.put('/organizations/'+updated_organization.id,{
           name: updated_organization.name,
           slug: updated_organization.slug

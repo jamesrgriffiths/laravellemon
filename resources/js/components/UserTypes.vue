@@ -36,7 +36,7 @@
             <div v-for="(user_type,index) in user_types" :key="user_type.id">
 
               <!-- User Type Info -->
-              <show-item
+              <show-item :key="update_counter"
                 :index="index"
                 :loading="loading"
                 :label="user_type.name"
@@ -111,6 +111,7 @@
         total: 0,
         page: 1,
         pages: [],
+        update_counter:0,
         user_types: []
       }
     },
@@ -161,6 +162,7 @@
       update(index) {
         this.loading = true;
         var user_type = this.user_types[index];
+        this.update_counter++;
         axios.put("/user_types/"+user_type.id,{name: user_type.name, route_access: user_type.route_access})
           .then(response => { this.loading = false; })
           .catch(error => { this.fetchData(); });

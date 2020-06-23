@@ -45,7 +45,7 @@
                 {'title': 'Message', 'value': log.message}
               ]"
               :options="[
-                {'action': 'modal', 'class': 'btn-outline-info', 'target': trace_modal_id+log.id, 'display': 'Full Trace'},
+                {'action': 'modal', 'class': 'btn-outline-info', 'target': trace_modal_id+log.id, 'display': 'Trace'},
                 {'action': 'click', 'class': 'btn-outline-danger', 'target': ['delete',log.id,index], 'display': 'Delete', 'disabled': loading}
               ]"
               @delete="deleteLog">
@@ -121,7 +121,7 @@
         this.loading = true;
         this.$delete(this.logs,index);
         this.total--;
-        axios.delete("/logs/"+id)
+        axios.delete("/logs/"+id,{params: {vue: true}})
           .then(response => { this.loading = false; })
           .catch(error => { this.fetchData(); });
       },

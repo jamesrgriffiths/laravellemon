@@ -27,7 +27,7 @@
           <div v-for="(user,index) in users" :key="user.id">
 
             <!-- User Info -->
-            <show-item
+            <show-item :key="update_counter"
               :index="index"
               :loading="loading"
               :label="user.name+' ('+user.email+')'"
@@ -100,6 +100,7 @@
         total: 0,
         page: 1,
         pages: [],
+        update_counter:0,
 
         users: [],
         current_user: '',
@@ -179,6 +180,7 @@
       updateUser(updated_user,index) {
         this.loading = true;
         this.users[index] = updated_user;
+        this.update_counter++;
         axios.put('/users/'+updated_user.id,{
           name: updated_user.name,
           email: updated_user.email,

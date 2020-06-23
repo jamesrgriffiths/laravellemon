@@ -9,8 +9,8 @@
 -->
 <template>
   <div class="row p-2" v-bind:class="index%2 ? 'bg-light' : ''">
-    <div v-if="label" class="col col-12 h5 font-weight-bold" :class="label_class">{{label}}</div>
-    <div class="col col-7">
+    <div v-if="label" class="col col-12 h6 font-weight-bold" :class="label_class">{{label}}</div>
+    <div class="col col-8">
       <div class="row">
         <div class="col col-12 my-auto" :class="data_space ? 'col-md-3' : 'col-md-4'">
           <span v-for="item in column_1"><b>{{item.title ? item.title+': ' : ''}}</b><span :class="item.special_class">{{item.value}}</span><br/></span>
@@ -27,7 +27,7 @@
         </div>
       </div>
     </div>
-    <div class="col col-5 my-auto text-right">
+    <div class="col col-4 my-auto text-right">
       <span v-for="option in options">
         <button v-if="option.action == 'modal'" class="btn btn-sm m-1" :class="option.class" data-toggle="modal" :data-target="'#'+option.target" :disabled="option.disabled">{{option.display}}</button>
         <button v-if="option.action == 'click'" class="btn btn-sm m-1" :class="option.class" v-on:click="emitEvent(option.target)" :disabled="option.disabled">{{option.display}}</button>

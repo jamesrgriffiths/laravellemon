@@ -43,7 +43,7 @@
             <div v-for="(variable,index) in variables" :key="variable.id">
 
               <!-- Variable Info -->
-              <show-item
+              <show-item :key="update_counter"
                 :index="index"
                 :loading="loading"
                 :label="variable.organization ? variable.organization.name+' - '+variable.type : 'Global - '+variable.type"
@@ -113,6 +113,7 @@
         initialized: false,
         loading: false,
         total: 0,
+        update_counter:0,
 
         variables: [],
         organizations: [],
@@ -181,6 +182,7 @@
       updateVariable(updated_variable,index) {
         this.loading = true;
         this.variables[index] = updated_variable;
+        this.update_counter++;
         axios.put('/variables/'+updated_variable.id,{
           value: updated_variable.value,
           organization_id: this.active_organization ? this.active_organization.id : updated_variable.organization_id
@@ -211,6 +213,7 @@
         if(success) {
           for(var i=0; i<this.variables.length; i++) {
             if(this.variables[i].type == 'Route Access') {
+              this.update_counter++;
               await axios.get("/variables",{params: {
                 option: 'get_assignable_routes_array',
                 option_value: this.variables[i].value}})
