@@ -49,7 +49,7 @@ class LogController extends Controller {
       $log->device_cleaned = $agent->browser() . " on " . $agent->platform();
     }
 
-    $ips = LogFacade::getIPs();
+    $ips = LogFacade::getDistinctFields('ip_address');
     $return_ips = [];
     foreach($ips as $ip) {
       array_push($return_ips,['id'=>$ip->ip_address, 'name'=>$ip->ip_address]);
@@ -59,12 +59,9 @@ class LogController extends Controller {
       "filter_type" => $filter_type,
       "filter_user" => $filter_user,
       "filter_ip" => $filter_ip,
-
       "users" => UserFacade::getAll('name'),
       "ips" => $return_ips,
-
       "logs" => $logs,
-
       "page" => $page,
       "pages" => Helper::getVisiblePages($logs->lastPage(),$page,3)
     ];

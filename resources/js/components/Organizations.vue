@@ -11,6 +11,11 @@
           :total="total">
         </heading>
 
+        <div v-if="alert" class="alert alert-danger alert-dismissible fade show text-center m-3">
+          {{alert_message}}
+          <button type="button" class="close" aria-label="Close" @click="alertClear()"><span aria-hidden="true">&times;</span></button>
+        </div>
+
         <!-- Body -->
         <div v-if="initialized" class="card-body">
 
@@ -72,7 +77,7 @@
             <!-- Delete Modal -->
             <modal-delete v-if="!active_organization"
               :modal_id="delete_modal_id+organization.id"
-              :text="'Are you sure you want to delete '+organization.name+'(#'+organization.id+')?'"
+              :text="'Are you sure you want to delete the organization '+organization.name+' (#'+organization.id+')? This will also delete all associated variables.'"
               @delete="deleteOrganization(organization.id,index)">
             </modal-delete>
 
@@ -111,13 +116,29 @@
         update_counter: 0,
 
         organizations: [],
-        active_organization: ''
+        active_organization: '',
+
+        // Alerts
+        alert: false,
+        alert_message: "",
       }
     },
     created() {
       this.fetchData();
     },
     methods: {
+
+      // Clears the alert
+      alertClear() {
+        this.alert = false;
+        this.alert_message = "";
+      },
+
+      // Sets an alert message
+      alertSet(message) {
+        this.alert = true;
+        this.alert_message = message;
+      },
 
       // Change the current page.
       changePage(page) {
@@ -132,7 +153,14 @@
           vue: true,
           name: obj.name,
           slug: obj.slug
-        }).then(response => { this.fetchData(); }).catch(error => { this.fetchData(); });
+        }).then(response => {
+          if(response.data == 0) {
+            this.alertSet("That organization (or sub domain) already exists.");
+            this.loading = false;
+          } else {
+            this.fetchData();
+          }
+        }).catch(error => { this.fetchData(); });
       },
 
       // Deletes the organization in the database, will only refresh on error.
@@ -164,12 +192,18 @@
       // Updates the organization in the database, will only refresh on error.
       updateOrganization(updated_organization,index) {
         this.loading = true;
-        this.organizations[index] = updated_organization;
-        this.update_counter++;
         axios.put('/organizations/'+updated_organization.id,{
           name: updated_organization.name,
           slug: updated_organization.slug
-        }).then(response => { this.fetchData(); }).catch(error => { this.fetchData(); });
+        }).then(response => {
+          if(response.data == 0) {
+            this.alertSet("That organization (or sub domain) already exists.");
+          } else {
+            this.organizations[index] = updated_organization;
+            this.update_counter++;
+          }
+          this.loading = false;
+        }).catch(error => { this.fetchData(); });
       },
 
     }

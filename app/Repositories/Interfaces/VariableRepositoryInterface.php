@@ -14,8 +14,6 @@ interface VariableRepositoryInterface extends RepositoryInterface {
 
   public function getAllSystemRoutes();
 
-  public function getTypes();
-
   public function getValueArray($organization_id,$type,$key);
 
 }

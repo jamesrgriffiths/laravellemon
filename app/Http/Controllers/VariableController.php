@@ -18,73 +18,76 @@ class VariableController extends Controller {
       return VariableFacade::getAssignableRoutesArray($request->option_value,'route_access');
     }
 
+    // Special Data
+    $organizations = OrganizationFacade::getAll('name');
+    $types = VariableFacade::getDistinctFields('type');
+
     // Filters
+    $filters = [];
+    $organization_options = [['id'=>0,'name'=>'All Organizations'],['id'=>'','name'=>'Global']];
+    foreach($organizations as $organization) { array_push($organization_options,['id'=>$organization->id,'name'=>$organization->name]); }
+    $type_options = [['id'=>'','name'=>'All Types']];
+    foreach($types as $type) { array_push($type_options,['id'=>$type->type,'name'=>$type->type]); }
+
+    // Filter Conditions
     $filter_conditions = [];
-    $filter_organization = isset($request->filter_organization) ? $request->filter_organization : 0;
-    $filter_type = isset($request->filter_type) ? $request->filter_type : '';
-    if($filter_organization != 0) { $filter_conditions['organization_id'] = $filter_organization; }
-    if($filter_type != '') { $filter_conditions['type'] = $filter_type; }
-
-    // Filter the organization if the client is under one.
-    if(session('organization')) { $filter_conditions['organization_id'] = session('organization')->id; }
-
-    $variables = $filter_conditions ? VariableFacade::where($filter_conditions,'type,key','ASC') : VariableFacade::getAll('type,key','ASC');
-    foreach($variables as $variable) {
-      $variable->organization = $variable->organization; // This enables the relationship in vue
-      if($variable->type == 'Route Access') {
-        $variable->routes = VariableFacade::getAssignableRoutesArray($variable->value,'route_access');
-      }
+    $filter_organization = $request->has('filter_organization') ? $request->filter_organization : 0;
+    $filter_type = $request->has('filter_type') ? $request->filter_type : '';
+    if($filter_organization == '') {
+      $filter_conditions['organization_id::null'] = '';
+    } elseif($filter_organization) {
+      $filter_conditions['organization_id'] = $filter_organization;
+    }
+    if($filter_type) {
+      $filter_conditions['type'] = $filter_type;
     }
 
-    $types = VariableFacade::getTypes();
-    $return_types = [];
-    foreach($types as $type) {
-      array_push($return_types,['id'=>$type->type, 'name'=>$type->type]);
+    // Filter the organization if the client is under one, then set the available filters accordingly
+    if(session('organization')) {
+      $filter_conditions['organization_id'] = session('organization')->id;
+    } else {
+      array_push($filters,['prop'=>'filter_organization','all_values'=>$organization_options]);
+    }
+    array_push($filters,['prop'=>'filter_type','all_values'=>$type_options]);
+
+    // Special values for the variables
+    $variables = $filter_conditions ? VariableFacade::where($filter_conditions,'type,key','ASC') : VariableFacade::getAll('type,key','ASC');
+    foreach($variables as $variable) {
+      $variable->organization_name = $variable->organization ? $variable->organization->name : 'Global';
+      $variable->organization_id = $variable->organization_id ?: '';
+      $variable->routes = $variable->type == 'Route Access' ? VariableFacade::getAssignableRoutesArray($variable->value,'route_access') : null;
     }
 
     $data = [
       'variables' => $variables,
       'active_organization' => session('organization'),
-      'organizations' => OrganizationFacade::getAll('name'),
+      'organizations' => $organizations,
+      'filters' => $filters,
       'filter_organization' => $filter_organization,
       'filter_type' => $filter_type,
-      'all_types' => $return_types
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);
   }
 
-  // Store a new database variable
+  // Store the variable, will return 0 for duplicate organization, type, and key.
   public function store(Request $request) {
-
-    // Return 0 if there is an existing variable.
-    if( ($request->organization_id && VariableFacade::whereFirst(['organization_id' => $request->organization_id,'type' => $request->type, 'key' => $request->key]))
-      || (!$request->organization_id && VariableFacade::whereFirst(['type' => $request->type, 'key' => $request->key])) ) {
-        return 0;
-      }
-
-    // Return the new variable.
-    return VariableFacade::store([
-      'type' => $request->type ?: '',
-      'key' => $request->key ?: '',
-      'value' => $request->value ?: '',
-      'info' => $request->info ?: '',
-      'organization_id' => $request->organization_id ?: NULL
-    ]);
-
+    $type = $request->has('type') ? $request->type : '';
+    $key = $request->has('key') ? $request->key : '';
+    $value = $request->has('value') ? $request->value : '';
+    $info = $request->has('info') ? $request->info : '';
+    $organization_id = $request->has('organization_id') ? $request->organization_id ?: NULL : NULL;
+    if(VariableFacade::whereFirst(['organization_id' => $organization_id, 'type' => $type, 'key' => $key])) { return 0; }
+    return VariableFacade::store(['type' => $type, 'key' => $key, 'value' => $value, 'info' => $info, 'organization_id' => $organization_id]);
   }
 
-  // Update a given database variable
+  // Update the variable, will return 0 for duplicate organization, type, and key
   public function update(Request $request, $id) {
     $variable = VariableFacade::find($id);
-
-    $organization_id = isset($request->organization_id) ? $request->organization_id : $variable->organization_id;
-    $organization_id = $organization_id == 0 ? NULL : $organization_id;
-
-    return VariableFacade::update($id,[
-      'value' => isset($request->value) ? $request->value : $variable->value,
-      'organization_id' => $organization_id
-    ]);
+    $value = $request->has('value') ? $request->value : $variable->value;
+    $organization_id = $request->has('organization_id') ? $request->organization_id == 0 ? NULL : $request->organization_id : $variable->organization_id;
+    if(VariableFacade::whereFirst(['organization_id' => $organization_id, 'type' => $variable->type, 'key' => $variable->key, 'id::!=' => $variable->id])) { return 0; }
+    return VariableFacade::update($id,['value' => $value, 'organization_id' => $organization_id]);
   }
 
   // Deletes a given database variable

@@ -22,7 +22,7 @@
             <div class="col col-3 my-auto h6">{{field.display}}</div>
             <div class="col col-9">
               <select v-if="field.type == 'select'" v-model="working_object[field.name]" class="form-control">
-                <option value="0"></option>
+                <option v-if="!field.hide_first_option" value="0"></option>
                 <option v-for="option in field.options" :value="option.id">{{option.name}}</option>
               </select>
               <input v-else type="text" class="form-control" v-model="working_object[field.name]">

@@ -33,8 +33,8 @@ class UserTypeController extends Controller {
   public function update(Request $request, $id) {
     $user_type = UserTypeFacade::find($id);
     return UserTypeFacade::update($id,[
-      'name' => $request->name ? $request->name : $user_type->name,
-      'route_access' => $request->route_access ? $request->route_access : $user_type->route_access
+      'name' => $request->has('name') ? $request->name : $user_type->name,
+      'route_access' => $request->has('route_access') ? $request->route_access : $user_type->route_access
     ]);
   }
 

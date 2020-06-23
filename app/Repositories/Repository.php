@@ -17,6 +17,10 @@ class Repository implements RepositoryInterface {
     return $this->model::find($id);
   }
 
+  public function getDistinctFields($field) {
+    return $this->model::select($field)->orderBy($field,'ASC')->distinct()->get();
+  }
+
   public function getAll($orderBy=null,$orderByDirection='asc',$take=null) {
     return $this->orderByAndTake($this->model::query(),$orderBy,$orderByDirection,$take)->get();
   }

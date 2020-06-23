@@ -13,9 +13,9 @@
           @change="changeFilter">
         </heading>
 
-        <div v-if="alert_danger" class="alert alert-danger alert-dismissible fade show text-center m-3">
+        <div v-if="alert" class="alert alert-danger alert-dismissible fade show text-center m-3">
           {{alert_message}}
-          <button type="button" class="close" aria-label="Close" @click="clearAlert()"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" aria-label="Close" @click="alertClear()"><span aria-hidden="true">&times;</span></button>
         </div>
 
           <!-- Body -->
@@ -37,7 +37,7 @@
                 {'name': 'key', 'display': 'Key'},
                 {'name': 'value', 'display': 'Value'},
                 {'name': 'info', 'display': 'Information'},
-                {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization}]"
+                {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'hide_first_option': true, 'options': organizations, 'invisible': active_organization}]"
               @save="createVariable">
             </modal-create>
 
@@ -48,7 +48,7 @@
               <show-item :key="update_counter"
                 :index="index"
                 :loading="loading"
-                :label="variable.organization ? variable.organization.name+' - '+variable.type : 'Global - '+variable.type"
+                :label="variable.organization_name+' - '+variable.type"
                 :label_class="'text-info'"
                 :data="[{'title': 'Key', 'value': variable.key}]"
                 :data_space="variable.routes ? variable.routes : variable.value"
@@ -73,14 +73,14 @@
                 :object="variable"
                 :fields="[
                   {'name': 'value', 'display': 'Value'},
-                  {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization}]"
+                  {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'hide_first_option': true, 'options': organizations, 'invisible': active_organization}]"
                 @save="updateVariable">
               </modal-edit>
 
               <!-- Delete Modal -->
               <modal-delete
                 :modal_id="delete_modal_id+variable.id"
-                :text="'Are you sure you want to delete variable '+variable.type+' - '+variable.key+'?'"
+                :text="'Are you sure you want to delete variable '+variable.organization_name+' '+variable.type+' - '+variable.key+'?'"
                 @delete="deleteVariable(variable.id,index)">
               </modal-delete>
 
@@ -121,7 +121,8 @@
         organizations: [],
         active_organization: [],
 
-        alert_danger: false,
+        // Alerts
+        alert: false,
         alert_message: "",
 
         // Filters
@@ -137,18 +138,22 @@
 
     methods: {
 
+      // Clears the alert
+      alertClear() {
+        this.alert = false;
+        this.alert_message = "";
+      },
+
+      // Sets an alert message
+      alertSet(message) {
+        this.alert = true;
+        this.alert_message = message;
+      },
+
       // Change the filter value and refresh the page.
       changeFilter(type,value) {
         this[type] = value;
-        console.log(this.filter_organization);
-        console.log(this.filter_type);
         this.fetchData();
-      },
-
-      // Clears the alerts
-      clearAlert() {
-        this.alert_danger = false;
-        this.alert_message = "";
       },
 
       // Creates a new variable
@@ -162,8 +167,7 @@
           organization_id: this.active_organization ? this.active_organization.id : obj.organization_id})
           .then(response => {
             if(response.data == 0) {
-              this.alert_danger = true;
-              this.alert_message = "That variable already exists.";
+              this.alertSet("That variable already exists.");
               this.loading = false;
             } else {
               this.fetchData();
@@ -185,17 +189,15 @@
       fetchData() {
         this.loading = true;
         axios.get("/variables",{params: {vue: true, filter_organization: this.filter_organization, filter_type: this.filter_type}}).then((response)=>{
-          this.filter_organization = response.data.filter_organization;
-          this.filter_type = response.data.filter_type;
-          this.filters = [
-            {'prop': 'filter_organization', 'all_values': [{'id': 0, 'name': 'All Organizations'}].concat(response.data.organizations)},
-            {'prop': 'filter_type', 'all_values': [{'id': '', 'name': 'All Types'}].concat(response.data.all_types)}
-          ];
-
           this.variables = response.data.variables;
-          this.organizations = response.data.organizations;
+          this.organizations = [{'id': '', 'name': 'Global'}].concat(response.data.organizations);
           this.active_organization = response.data.active_organization;
           this.total = parseInt(this.variables.length);
+
+          this.filters = response.data.filters;
+          this.filter_organization = response.data.filter_organization;
+          this.filter_type = response.data.filter_type;
+
           this.loading = false;
           this.initialized = true;
         });
@@ -204,13 +206,19 @@
       updateVariable(updated_variable,index) {
         this.loading = true;
         this.variables[index] = updated_variable;
-        this.update_counter++;
         axios.put('/variables/'+updated_variable.id,{
           value: updated_variable.value,
           organization_id: this.active_organization ? this.active_organization.id : updated_variable.organization_id
         })
-          .then(response => { this.fetchData(); })
-          .catch(error => { this.fetchData(); });
+          .then(response => {
+            if(response.data == 0) {
+              this.alertSet("That variable already exists.");
+            } else {
+              this.organizations[index] = updated_organization;
+              this.update_counter++;
+            }
+            this.loading = false;
+          }).catch(error => { this.fetchData(); });
       },
 
       async updateVariableRoutes(updated_variable,index) {

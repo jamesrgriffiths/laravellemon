@@ -94,11 +94,6 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return Helper::cleanArray($routes);
   }
 
-  // Returns an array of distinct types found in the variables table.
-  public function getTypes() {
-    return Variable::select('type')->orderBy('type','ASC')->distinct()->get();
-  }
-
   // Return the value found by organization, type, and key in an array format.
   // $organization_id REQUIRED:
   //    NULL will look for only null (global) organization variables.
