@@ -73,9 +73,9 @@ class Repository implements RepositoryInterface {
     $this->model::destroy($id);
   }
 
-  // PRIVATE FUNCTIONS
+  // SPECIAL QUERY FUNCTIONS
 
-  private function orderByAndTake($query,$orderBy,$orderByDirection,$take) {
+  public function orderByAndTake($query,$orderBy,$orderByDirection,$take) {
     if($orderBy) {
       foreach(explode(',',$orderBy) as $orderByItem) {
         $query->orderBy($orderByItem,$orderByDirection);
@@ -88,7 +88,7 @@ class Repository implements RepositoryInterface {
 
   // $query - the query being built up
   // $data = [[$key_1::$operator_1 => $value_1],...[$key_n::$operator_n => $value_n]]
-  private function whereOptions($query,$data) {
+  public function whereOptions($query,$data) {
     foreach($data as $key => $value) {
       $operator = "=";
       if(strpos($key,"::") !== false) {

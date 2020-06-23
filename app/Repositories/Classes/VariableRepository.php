@@ -117,4 +117,27 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return [];
   }
 
+  // Sort variables by organization, type, and key.
+  public function getAllSort() {
+    return $this->model::with('organization')
+      ->select('variables.*')
+      ->leftjoin('organizations','organizations.id','=','variables.organization_id')
+      ->orderBy('organizations.name')
+      ->orderBy('variables.type')
+      ->orderBy('variables.key')
+      ->get();
+  }
+
+  // Sort variables by organization, type, and key with where options
+  public function whereSort($data) {
+    return parent::whereOptions(
+      $this->model::with('organization')
+      ->select('variables.*')
+      ->leftjoin('organizations','organizations.id','=','variables.organization_id'),$data)
+        ->orderBy('organizations.name')
+        ->orderBy('variables.type')
+        ->orderBy('variables.key')
+        ->get();
+  }
+
 }

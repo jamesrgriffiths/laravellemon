@@ -24,7 +24,7 @@ class VariableController extends Controller {
 
     // Filters
     $filters = [];
-    $organization_options = [['id'=>0,'name'=>'All Organizations'],['id'=>'','name'=>'Global']];
+    $organization_options = [['id'=>0,'name'=>'All Organizations'],['id'=>-1,'name'=>'Global']];
     foreach($organizations as $organization) { array_push($organization_options,['id'=>$organization->id,'name'=>$organization->name]); }
     $type_options = [['id'=>'','name'=>'All Types']];
     foreach($types as $type) { array_push($type_options,['id'=>$type->type,'name'=>$type->type]); }
@@ -33,7 +33,7 @@ class VariableController extends Controller {
     $filter_conditions = [];
     $filter_organization = $request->has('filter_organization') ? $request->filter_organization : 0;
     $filter_type = $request->has('filter_type') ? $request->filter_type : '';
-    if($filter_organization == '') {
+    if($filter_organization == -1) {
       $filter_conditions['organization_id::null'] = '';
     } elseif($filter_organization) {
       $filter_conditions['organization_id'] = $filter_organization;
@@ -51,7 +51,7 @@ class VariableController extends Controller {
     array_push($filters,['prop'=>'filter_type','all_values'=>$type_options]);
 
     // Special values for the variables
-    $variables = $filter_conditions ? VariableFacade::where($filter_conditions,'type,key','ASC') : VariableFacade::getAll('type,key','ASC');
+    $variables = $filter_conditions ? VariableFacade::whereSort($filter_conditions) : VariableFacade::getAllSort();
     foreach($variables as $variable) {
       $variable->organization_name = $variable->organization ? $variable->organization->name : 'Global';
       $variable->organization_id = $variable->organization_id ?: '';

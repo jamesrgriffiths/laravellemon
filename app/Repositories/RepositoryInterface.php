@@ -26,4 +26,10 @@ interface RepositoryInterface {
 
   public function delete($id);
 
+  // SPECIAL QUERY FUNCTIONS
+
+  public function orderByAndTake($query,$orderBy,$orderByDirection,$take);
+
+  public function whereOptions($query,$data);
+
 }
