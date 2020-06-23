@@ -59,12 +59,12 @@ class VariableController extends Controller {
     }
 
     $data = [
-      'variables' => $variables,
-      'active_organization' => session('organization'),
-      'organizations' => $organizations,
       'filters' => $filters,
       'filter_organization' => $filter_organization,
       'filter_type' => $filter_type,
+      'variables' => $variables,
+      'active_organization' => session('organization'),
+      'organizations' => $organizations,
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);

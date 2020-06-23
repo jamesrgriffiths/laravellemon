@@ -152,14 +152,10 @@
           filter_verified: this.filter_verified,
           filter_user_type: this.filter_user_type
         }}).then((response)=>{
+          this.filters = response.data.filters;
           this.filter_active = response.data.filter_active;
           this.filter_verified = response.data.filter_verified;
           this.filter_user_type = response.data.filter_user_type;
-          this.filters = [
-            {'prop': 'filter_active', 'all_values': [{'id': -1, 'name': 'All'},{'id': 1, 'name': 'Active'},{'id': 0, 'name': 'Inactive'}]},
-            {'prop': 'filter_verified', 'all_values': [{'id': -1, 'name': 'All'},{'id': 1, 'name': 'Verified'},{'id': 0, 'name': 'Unverified'}]},
-            {'prop': 'filter_user_type', 'all_values': [{'id': 0, 'name': 'All User Types'}].concat(response.data.user_types)}
-          ];
 
           this.users = response.data.users.data;
           this.current_user = response.data.current_user;

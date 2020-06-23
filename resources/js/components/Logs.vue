@@ -133,18 +133,11 @@
           this.filter_type = response.data.filter_type;
           this.filter_user = response.data.filter_user;
           this.filter_ip = response.data.filter_ip;
-          this.filters = [
-            {'prop': 'filter_type', 'all_values': [{'id': 0, 'name': 'All Types'},{'id': 'request', 'name': 'Requests'},{'id': 'error', 'name': 'Errors'}]},
-            {'prop': 'filter_user', 'all_values': [{'id': 0, 'name': 'All Users'},{'id': -1, 'name': 'No User'}].concat(response.data.users)},
-            {'prop': 'filter_ip', 'all_values': [{'id': 0, 'name': 'All IPs'}].concat(response.data.ips)}
-          ];
-
+          this.filters = response.data.filters;
           this.logs = response.data.logs.data;
-
           this.total = parseInt(response.data.logs.total);
           this.page = parseInt(response.data.page);
           this.pages = response.data.pages;
-
           this.$nextTick(() => {
             this.loading = false;
             this.initialized = true;
