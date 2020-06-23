@@ -23,10 +23,10 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     $routes = [];
     $active_routes = explode(',',$active_routes_string);
     $unassignable_routes = array_merge(
-      $this::getValueArrayByTypeAndKey('Route Access','routes_protected'),
-      $this::getValueArrayByTypeAndKey('Route Access','routes_public'),
-      $this::getValueArrayByTypeAndKey('Route Access','routes_logged_in'),
-      $this::getValueArrayByTypeAndKey('Route Access','routes_admin') );
+      $this::getValueArray(NULL,'Route Access','routes_protected'),
+      $this::getValueArray(NULL,'Route Access','routes_public'),
+      $this::getValueArray(NULL,'Route Access','routes_logged_in'),
+      $this::getValueArray(NULL,'Route Access','routes_admin') );
 
     // Route access can not assign routes that are already assigned to users
     if($type == 'route_access') {
@@ -38,7 +38,7 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
       $unassignable_routes = array_merge($unassignable_routes,$user_assigned_routes);
     }
 
-    foreach($this::getSystemRoutes() as $route) {
+    foreach($this::getAllSystemRoutes() as $route) {
       if(in_array($route,$active_routes)) {
         $routes[] = (object)['active' => 1, 'name' => $route];
       } elseif(!in_array($route,$unassignable_routes)) {
@@ -52,14 +52,14 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     $user = UserFacade::find($user_id);
 
     // Logged In Routes
-    $accessible_routes = $this::getValueArrayByTypeAndKey('Route Access','routes_logged_in');
+    $accessible_routes = $this::getValueArray(NULL,'Route Access','routes_logged_in');
 
     // The email must be verified before accessing user type specific pages
     if($user->email_verified_at) {
 
       // Admin Routes
       if($user->is_admin) {
-        $accessible_routes = array_merge($accessible_routes,$this::getValueArrayByTypeAndKey('Route Access','routes_admin'),$this::getSystemRoutes());
+        $accessible_routes = array_merge($accessible_routes,$this::getValueArray(NULL,'Route Access','routes_admin'),$this::getSystemRoutes());
       }
 
       // User Routes
@@ -75,7 +75,7 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
   // Returns an array of routes on this system by name. - Does not include protected routes.
   public function getSystemRoutes() {
     $routes = [];
-    $protected_routes = $this::getValueArrayByTypeAndKey('Route Access','routes_protected');
+    $protected_routes = $this::getValueArray(NULL,'Route Access','routes_protected');
     foreach($this::getAllSystemRoutes() as $route) {
       if(!in_array($route,$protected_routes)) {
         $routes[] = $route;
@@ -93,10 +93,22 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return Helper::cleanArray($routes);
   }
 
-  // Return the value found by type and key in an array format, assuming comma
-  // seperation and removing blank values.
-  public function getValueArrayByTypeAndKey($type,$key) {
-    $object = $this::whereFirst(['type' => $type, 'key' => $key]);
+  // Return the value found by organization, type, and key in an array format.
+  // $organization_id REQUIRED:
+  //    NULL will look for only null (global) organization variables.
+  //    0 will look for all organization variables
+  // $type REQUIRED
+  // $key REQUIRED
+  public function getValueArray($organization_id,$type,$key) {
+    $object = NULL;
+    if($organization_id) {
+      $object = $this::whereFirst(['organization_id' => $organization_id, 'type' => $type, 'key' => $key]);
+    } elseif($organization_id == 0) {
+      $object = $this::whereFirst(['type' => $type, 'key' => $key]);
+    } else {
+      $object = $this::whereFirst(['organization_id::null' => '', 'type' => $type, 'key' => $key]);
+    }
+
     if($object) {
       $value = $object->value;
       return Helper::cleanArray(explode(",",$value));

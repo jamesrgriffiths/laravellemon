@@ -42,14 +42,20 @@
           <div v-for="(organization,index) in organizations" :key="organization.id">
 
             <!-- Organization Info -->
-            <organization
+            <show-item
               :index="index"
-              :organization="organization"
               :loading="loading"
-              :edit_modal_id="edit_modal_id+organization.id"
-              :delete_modal_id="delete_modal_id+organization.id"
-              :delete_disabled="active_organization">
-            </organization>
+              :label="organization.name"
+              :label_class="'text-info'"
+              :data="[
+                {'title': 'Sub Domain', 'value': organization.slug},
+                {'title': 'Users', 'value': organization.user_count}
+              ]"
+              :options="[
+                {'action': 'modal', 'class': 'btn-outline-info', 'target': edit_modal_id+organization.id, 'display': 'Edit', 'disabled': loading},
+                {'action': 'modal', 'class': 'btn-outline-danger', 'target': delete_modal_id+organization.id, 'display': 'Delete', 'disabled': loading}
+              ]">
+            </show-item>
 
             <!-- Organization Edit Modal -->
             <modal-edit
@@ -85,11 +91,11 @@
   import ModalCreate from './child_components/ModalCreate';
   import ModalDelete from './child_components/ModalDelete';
   import ModalEdit from './child_components/ModalEdit';
-  import Organization from './child_components/Organization';
   import Pagination from './child_components/Pagination';
+  import ShowItem from './child_components/ShowItem';
 
   export default {
-    components: { Heading, ModalCreate, ModalDelete, ModalEdit, Organization, Pagination },
+    components: { Heading, ModalCreate, ModalDelete, ModalEdit, Pagination, ShowItem },
     data() {
       return {
         title: 'Organizations',

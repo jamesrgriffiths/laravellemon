@@ -36,14 +36,19 @@
             <div v-for="(user_type,index) in user_types" :key="user_type.id">
 
               <!-- User Type Info -->
-              <user-type
+              <show-item
                 :index="index"
-                :user_type="user_type"
                 :loading="loading"
-                :assign_modal_id="assign_modal_id+user_type.id"
-                :edit_modal_id="edit_modal_id+user_type.id"
-                :delete_modal_id="delete_modal_id+user_type.id">
-              </user-type>
+                :label="user_type.name"
+                :label_class="'text-info'"
+                :data="[{'title': 'Users', 'value': user_type.user_count}]"
+                :data_space="user_type.routes"
+                :options="[
+                  {'action': 'modal', 'class': 'btn-outline-info', 'target': assign_modal_id+user_type.id, 'display': 'Assign Routes', 'disabled': loading},
+                  {'action': 'modal', 'class': 'btn-outline-info', 'target': edit_modal_id+user_type.id, 'display': 'Edit', 'disabled': loading},
+                  {'action': 'modal', 'class': 'btn-outline-danger', 'target': delete_modal_id+user_type.id, 'display': 'Delete', 'disabled': loading}
+                ]">
+              </show-item>
 
               <!-- Assign Routes Modal -->
               <modal-edit-route-access
@@ -88,11 +93,11 @@
   import ModalEdit from './child_components/ModalEdit';
   import ModalEditRouteAccess from './child_components/ModalEditRouteAccess';
   import Pagination from './child_components/Pagination';
-  import UserType from './child_components/UserType';
+  import ShowItem from './child_components/ShowItem';
 
   export default {
 
-    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, Pagination, UserType },
+    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, Pagination, ShowItem },
 
     data() {
       return {

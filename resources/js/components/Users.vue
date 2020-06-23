@@ -27,14 +27,23 @@
           <div v-for="(user,index) in users" :key="user.id">
 
             <!-- User Info -->
-            <user
+            <show-item
               :index="index"
-              :user="user"
               :loading="loading"
-              :current_user="current_user"
-              :edit_modal_id="edit_modal_id+user.id"
-              :delete_modal_id="delete_modal_id+user.id">
-            </user>
+              :label="user.name+' ('+user.email+')'"
+              :label_class="'text-info'"
+              :data="[
+                {'title': 'Organization', 'value': user.organization ? user.organization.name : 'Global'},
+                {'title': 'User Type', 'value': user.is_admin ? 'Admin' : user.userType ? user.userType.name : 'None'},
+                {'title': '', 'value': user.is_active ? 'Active' : 'Inactive', 'special_class': user.is_active ? 'text-success' : 'text-danger', 'no_break': true},
+                {'title': '', 'value': user.email_verified_at ? 'Verified' : 'Unverified', 'special_class': user.email_verified_at ? 'text-success' : 'text-danger'},
+                {'title': 'Last Logged In', 'value': user.last_logged_in_formatted ? user.last_logged_in_formatted : 'Never', 'special_class': user.last_logged_in_formatted ? '' : 'text-danger'}
+              ]"
+              :options="[
+                {'action': 'modal', 'class': 'btn-outline-info', 'target': edit_modal_id+user.id, 'display': 'Edit', 'disabled': loading},
+                {'action': 'modal', 'class': user.id == current_user.id ? 'btn-outline-secondary' : 'btn-outline-danger', 'target': delete_modal_id+user.id, 'display': 'Delete', 'disabled': loading || user.id == current_user.id}
+              ]">
+            </show-item>
 
             <!-- User Edit Modal -->
             <modal-edit
@@ -76,10 +85,10 @@
   import ModalDelete from './child_components/ModalDelete';
   import ModalEdit from './child_components/ModalEdit';
   import Pagination from './child_components/Pagination';
-  import User from './child_components/User';
+  import ShowItem from './child_components/ShowItem';
 
   export default {
-    components: { Heading, ModalDelete, ModalEdit, Pagination, User },
+    components: { Heading, ModalDelete, ModalEdit, Pagination, ShowItem },
     data() {
       return {
         title: 'Users',

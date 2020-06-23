@@ -11,7 +11,7 @@ class Variable extends Model {
   protected $dates = ['deleted_at'];
 
   // The attributes that are mass assignable.
-  protected $fillable = [ 'organization_id', 'type', 'key', 'value', 'protected', 'created_by', 'updated_by', 'deleted_by' ];
+  protected $fillable = [ 'organization_id', 'type', 'key', 'value', 'protected', 'info', 'created_by', 'updated_by', 'deleted_by' ];
 
   // Relationships
   public function organization() {

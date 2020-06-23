@@ -22,6 +22,7 @@ class CreateVariablesTable extends Migration
           $table->string('key')->nullable();
           $table->longText('value')->nullable();
           $table->boolean('protected')->default(0);
+          $table->longText('info')->nullable();
 
           $table->timestamps();
           $table->softDeletes();

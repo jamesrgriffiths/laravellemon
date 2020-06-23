@@ -16,7 +16,7 @@ class SetSessionRoutes {
      * @return mixed
      */
     public function handle($request, Closure $next) {
-      session(['public_routes' => VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_public')]);
+      session(['public_routes' => VariableFacade::getValueArray(NULL,'Route Access','routes_public')]);
       session(['user_routes' => Auth::user() ? VariableFacade::getLoggedInUserRoutes(Auth::user()->id) : []]);
       return $next($request);
     }

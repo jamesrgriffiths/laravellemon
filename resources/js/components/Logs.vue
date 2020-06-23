@@ -29,13 +29,27 @@
           <div v-for="(log,index) in logs" :key="log.id">
 
             <!-- Log Info -->
-            <log
+            <show-item
               :index="index"
-              :log="log"
               :loading="loading"
-              :trace_modal_id="trace_modal_id+log.id"
+              :label="log.type"
+              :label_class="log.type == 'Error' ? 'text-danger' : 'text-info'"
+              :data="[
+                {'title': 'Time', 'value': convertDateTime(log.created_at)},
+                {'title': 'User', 'value': log.user ? log.user.name+' - '+log.organization_name+' '+log.user_type_name : 'None'},
+                {'title': 'IP', 'value': log.ip_address},
+                {'title': 'Device', 'value': log.device_cleaned},
+                {'title': 'URL', 'value': log.url},
+                {'title': 'Run Time', 'value': log.run_time},
+                {'title': 'Class', 'value': log.class},
+                {'title': 'Message', 'value': log.message}
+              ]"
+              :options="[
+                {'action': 'modal', 'class': 'btn-outline-info', 'target': trace_modal_id+log.id, 'display': 'Full Trace'},
+                {'action': 'click', 'class': 'btn-outline-danger', 'target': ['delete',log.id,index], 'display': 'Delete', 'disabled': loading}
+              ]"
               @delete="deleteLog">
-            </log>
+            </show-item>
 
             <!-- Full Trace Modal -->
             <modal-info
@@ -57,13 +71,13 @@
 <script>
 
   import Heading from './child_components/Heading';
-  import Log from './child_components/Log';
   import ModalInfo from './child_components/ModalInfo';
   import Pagination from './child_components/Pagination';
+  import ShowItem from './child_components/ShowItem';
 
   export default {
 
-    components: { Heading, Log, ModalInfo, Pagination },
+    components: { Heading, ModalInfo, Pagination, ShowItem },
 
     data() {
       return {

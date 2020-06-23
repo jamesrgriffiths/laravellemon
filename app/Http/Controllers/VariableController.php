@@ -41,12 +41,22 @@ class VariableController extends Controller {
 
   // Store a new database variable
   public function store(Request $request) {
+
+    // Return 0 if there is an existing variable.
+    if( ($request->organization_id && VariableFacade::whereFirst(['organization_id' => $request->organization_id,'type' => $request->type, 'key' => $request->key]))
+      || (!$request->organization_id && VariableFacade::whereFirst(['type' => $request->type, 'key' => $request->key])) ) {
+        return 0;
+      }
+
+    // Return the new variable.
     return VariableFacade::store([
       'type' => $request->type ?: '',
       'key' => $request->key ?: '',
       'value' => $request->value ?: '',
+      'info' => $request->info ?: '',
       'organization_id' => $request->organization_id ?: NULL
     ]);
+
   }
 
   // Update a given database variable

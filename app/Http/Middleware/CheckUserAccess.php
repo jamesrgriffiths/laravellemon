@@ -21,7 +21,7 @@ class CheckUserAccess {
       $current_route = explode('.',$request->route()->getName())[0];
 
       // The routes that are available publicly
-      $accessible_routes = array_merge(VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_protected'),VariableFacade::getValueArrayByTypeAndKey('Route Access','routes_public'));
+      $accessible_routes = array_merge(VariableFacade::getValueArray(NULL,'Route Access','routes_protected'),VariableFacade::getValueArray(NULL,'Route Access','routes_public'));
 
       // The empty route should always be accessible.
       array_push($accessible_routes,'');

@@ -12,7 +12,10 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-info" id="modalLabel">{{label}}</h5>
+          <div>
+            <div class="modal-title text-info h5">{{label}}</div>
+            <div v-if="working_object.info" class="text-secondary small">{{working_object.info}}</div>
+          </div>
         </div>
         <div class="modal-body">
           <div v-if="fields && !field.invisible" v-for="field in fields" class="row mb-1">

@@ -11,6 +11,11 @@
           :total="total">
         </heading>
 
+        <div v-if="alert_danger" class="alert alert-danger alert-dismissible fade show text-center m-3">
+          {{alert_message}}
+          <button type="button" class="close" aria-label="Close" @click="clearAlert()"><span aria-hidden="true">&times;</span></button>
+        </div>
+
           <!-- Body -->
           <div v-if="initialized" class="card-body">
 
@@ -29,6 +34,7 @@
                 {'name': 'type', 'display': 'Type'},
                 {'name': 'key', 'display': 'Key'},
                 {'name': 'value', 'display': 'Value'},
+                {'name': 'info', 'display': 'Information'},
                 {'name': 'organization_id', 'display': 'Organization', 'type': 'select', 'options': organizations, 'invisible': active_organization}]"
               @save="createVariable">
             </modal-create>
@@ -37,13 +43,18 @@
             <div v-for="(variable,index) in variables" :key="variable.id">
 
               <!-- Variable Info -->
-              <variable
+              <show-item
                 :index="index"
-                :variable="variable"
                 :loading="loading"
-                :edit_modal_id="edit_modal_id+variable.id"
-                :delete_modal_id="delete_modal_id+variable.id">
-              </variable>
+                :label="variable.organization ? variable.organization.name+' - '+variable.type : 'Global - '+variable.type"
+                :label_class="'text-info'"
+                :data="[{'title': 'Key', 'value': variable.key}]"
+                :data_space="variable.routes ? variable.routes : variable.value"
+                :options="[
+                  {'action': 'modal', 'class': 'btn-outline-info', 'target': edit_modal_id+variable.id, 'display': 'Edit', 'disabled': loading},
+                  {'action': 'modal', 'class': variable.protected == 1 ? 'btn-outline-secondary' : 'btn-outline-danger', 'target': delete_modal_id+variable.id, 'display': 'Delete', 'disabled': loading || variable.protected == 1}
+                ]">
+              </show-item>
 
               <!-- Edit Modal -->
               <modal-edit-route-access v-if="variable.type == 'Route Access'"
@@ -87,11 +98,11 @@
   import ModalDelete from './child_components/ModalDelete';
   import ModalEdit from './child_components/ModalEdit';
   import ModalEditRouteAccess from './child_components/ModalEditRouteAccess';
-  import Variable from './child_components/Variable';
+  import ShowItem from './child_components/ShowItem';
 
   export default {
 
-    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, Variable },
+    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, ShowItem },
 
     data() {
       return {
@@ -105,7 +116,10 @@
 
         variables: [],
         organizations: [],
-        active_organization: []
+        active_organization: [],
+
+        alert_danger: false,
+        alert_message: ""
       }
     },
 
@@ -115,6 +129,12 @@
 
     methods: {
 
+      // Clears the alerts
+      clearAlert() {
+        this.alert_danger = false;
+        this.alert_message = "";
+      },
+
       // Creates a new variable
       createVariable(obj) {
         this.loading = true;
@@ -122,9 +142,17 @@
           type: obj.type,
           key: obj.key,
           value: obj.value,
+          info: obj.info,
           organization_id: this.active_organization ? this.active_organization.id : obj.organization_id})
-          .then(response => { this.fetchData(); })
-          .catch(error => { this.fetchData(); });
+          .then(response => {
+            if(response.data == 0) {
+              this.alert_danger = true;
+              this.alert_message = "That variable already exists.";
+              this.loading = false;
+            } else {
+              this.fetchData();
+            }
+          }).catch(error => { this.fetchData(); });
       },
 
       // Delete a given variable
