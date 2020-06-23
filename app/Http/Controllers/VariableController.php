@@ -18,8 +18,14 @@ class VariableController extends Controller {
       return VariableFacade::getAssignableRoutesArray($request->option_value,'route_access');
     }
 
-    // Filter organization if there is one
+    // Filters
     $filter_conditions = [];
+    $filter_organization = isset($request->filter_organization) ? $request->filter_organization : 0;
+    $filter_type = isset($request->filter_type) ? $request->filter_type : '';
+    if($filter_organization != 0) { $filter_conditions['organization_id'] = $filter_organization; }
+    if($filter_type != '') { $filter_conditions['type'] = $filter_type; }
+
+    // Filter the organization if the client is under one.
     if(session('organization')) { $filter_conditions['organization_id'] = session('organization')->id; }
 
     $variables = $filter_conditions ? VariableFacade::where($filter_conditions,'type,key','ASC') : VariableFacade::getAll('type,key','ASC');
@@ -30,10 +36,19 @@ class VariableController extends Controller {
       }
     }
 
+    $types = VariableFacade::getTypes();
+    $return_types = [];
+    foreach($types as $type) {
+      array_push($return_types,['id'=>$type->type, 'name'=>$type->type]);
+    }
+
     $data = [
       'variables' => $variables,
       'active_organization' => session('organization'),
-      'organizations' => OrganizationFacade::getAll('name')
+      'organizations' => OrganizationFacade::getAll('name'),
+      'filter_organization' => $filter_organization,
+      'filter_type' => $filter_type,
+      'all_types' => $return_types
     ];
 
     return $request->vue ? $data : view('layouts.app')->with($data);

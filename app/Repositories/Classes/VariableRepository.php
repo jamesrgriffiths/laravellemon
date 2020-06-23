@@ -7,6 +7,7 @@ use App\Repositories\Repository;
 use App\Repositories\Facades\UserFacade;
 use App\Repositories\Facades\UserTypeFacade;
 use App\Repositories\Interfaces\VariableRepositoryInterface;
+use App\Variable;
 use Config;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -91,6 +92,11 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
       $routes[] = explode('.',$route->getName())[0];
     }
     return Helper::cleanArray($routes);
+  }
+
+  // Returns an array of distinct types found in the variables table.
+  public function getTypes() {
+    return Variable::select('type')->orderBy('type','ASC')->distinct()->get();
   }
 
   // Return the value found by organization, type, and key in an array format.

@@ -8,7 +8,9 @@
           :title="title"
           :initialized="initialized"
           :loading="loading"
-          :total="total">
+          :total="total"
+          :filters="filters"
+          @change="changeFilter">
         </heading>
 
         <div v-if="alert_danger" class="alert alert-danger alert-dismissible fade show text-center m-3">
@@ -120,7 +122,12 @@
         active_organization: [],
 
         alert_danger: false,
-        alert_message: ""
+        alert_message: "",
+
+        // Filters
+        filter_organization: 0,
+        filter_type: '',
+        filters: []
       }
     },
 
@@ -129,6 +136,14 @@
     },
 
     methods: {
+
+      // Change the filter value and refresh the page.
+      changeFilter(type,value) {
+        this[type] = value;
+        console.log(this.filter_organization);
+        console.log(this.filter_type);
+        this.fetchData();
+      },
 
       // Clears the alerts
       clearAlert() {
@@ -169,7 +184,14 @@
       // Initial retrieval and refresh of data
       fetchData() {
         this.loading = true;
-        axios.get("/variables",{params: {vue: true}}).then((response)=>{
+        axios.get("/variables",{params: {vue: true, filter_organization: this.filter_organization, filter_type: this.filter_type}}).then((response)=>{
+          this.filter_organization = response.data.filter_organization;
+          this.filter_type = response.data.filter_type;
+          this.filters = [
+            {'prop': 'filter_organization', 'all_values': [{'id': 0, 'name': 'All Organizations'}].concat(response.data.organizations)},
+            {'prop': 'filter_type', 'all_values': [{'id': '', 'name': 'All Types'}].concat(response.data.all_types)}
+          ];
+
           this.variables = response.data.variables;
           this.organizations = response.data.organizations;
           this.active_organization = response.data.active_organization;

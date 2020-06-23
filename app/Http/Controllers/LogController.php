@@ -50,7 +50,10 @@ class LogController extends Controller {
     }
 
     $ips = LogFacade::getIPs();
-    foreach($ips as $ip) { $ip->name = $ip->ip_address; }
+    $return_ips = [];
+    foreach($ips as $ip) {
+      array_push($return_ips,['id'=>$ip->ip_address, 'name'=>$ip->ip_address]);
+    }
 
     $data = [
       "filter_type" => $filter_type,
@@ -58,7 +61,7 @@ class LogController extends Controller {
       "filter_ip" => $filter_ip,
 
       "users" => UserFacade::getAll('name'),
-      "ips" => $ips,
+      "ips" => $return_ips,
 
       "logs" => $logs,
 
