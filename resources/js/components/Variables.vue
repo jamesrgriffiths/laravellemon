@@ -41,6 +41,9 @@
               @save="createVariable">
             </modal-create>
 
+            <!-- Pagination -->
+            <pagination :page="page" :pages="pages" @change="changePage"></pagination>
+
             <!-- List of Variables -->
             <div v-for="(variable,index) in variables" :key="variable.id">
 
@@ -100,11 +103,12 @@
   import ModalDelete from './child_components/ModalDelete';
   import ModalEdit from './child_components/ModalEdit';
   import ModalEditRouteAccess from './child_components/ModalEditRouteAccess';
+  import Pagination from './child_components/Pagination';
   import ShowItem from './child_components/ShowItem';
 
   export default {
 
-    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, ShowItem },
+    components: { Heading, ModalCreate, ModalDelete, ModalEdit, ModalEditRouteAccess, Pagination, ShowItem },
 
     data() {
       return {
@@ -120,6 +124,10 @@
         variables: [],
         organizations: [],
         active_organization: [],
+
+        // Pagination
+        page: 1,
+        pages: [],
 
         // Alerts
         alert: false,
@@ -156,6 +164,12 @@
         this.fetchData();
       },
 
+      // Change the current page.
+      changePage(page) {
+        this.page = page;
+        this.fetchData();
+      },
+
       // Creates a new variable
       createVariable(obj) {
         this.loading = true;
@@ -188,11 +202,14 @@
       // Initial retrieval and refresh of data
       fetchData() {
         this.loading = true;
-        axios.get("/variables",{params: {vue: true, filter_organization: this.filter_organization, filter_type: this.filter_type}}).then((response)=>{
-          this.variables = response.data.variables;
+        axios.get("/variables",{params: {vue: true, page: this.page, filter_organization: this.filter_organization, filter_type: this.filter_type}}).then((response)=>{
+          this.variables = response.data.variables.data;
           this.organizations = [{'id': '', 'name': 'Global'}].concat(response.data.organizations);
           this.active_organization = response.data.active_organization;
           this.total = parseInt(this.variables.length);
+
+          this.page = parseInt(response.data.page);
+          this.pages = response.data.pages;
 
           this.filters = response.data.filters;
           this.filter_organization = response.data.filter_organization;

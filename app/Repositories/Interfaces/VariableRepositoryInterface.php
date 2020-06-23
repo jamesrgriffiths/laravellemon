@@ -16,8 +16,8 @@ interface VariableRepositoryInterface extends RepositoryInterface {
 
   public function getValueArray($organization_id,$type,$key);
 
-  public function getAllSort();
+  public function getAllSortPaginated($paginate);
 
-  public function whereSort($data);
+  public function whereSortPaginated($data,$paginate);
 
 }

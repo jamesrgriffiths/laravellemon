@@ -12,6 +12,7 @@ class VariableController extends Controller {
 
   // Show the database variables
   public function index(Request $request) {
+    $page = $request->page ? $request->page : 1;
 
     // Other options
     if($request->option && $request->option == 'get_assignable_routes_array') {
@@ -51,7 +52,7 @@ class VariableController extends Controller {
     array_push($filters,['prop'=>'filter_type','all_values'=>$type_options]);
 
     // Special values for the variables
-    $variables = $filter_conditions ? VariableFacade::whereSort($filter_conditions) : VariableFacade::getAllSort();
+    $variables = $filter_conditions ? VariableFacade::whereSortPaginated($filter_conditions,25) : VariableFacade::getAllSortPaginated(25);
     foreach($variables as $variable) {
       $variable->organization_name = $variable->organization ? $variable->organization->name : 'Global';
       $variable->organization_id = $variable->organization_id ?: '';
@@ -59,6 +60,8 @@ class VariableController extends Controller {
     }
 
     $data = [
+      "page" => $page,
+      "pages" => Helper::getVisiblePages($variables->lastPage(),$page,3),
       'filters' => $filters,
       'filter_organization' => $filter_organization,
       'filter_type' => $filter_type,

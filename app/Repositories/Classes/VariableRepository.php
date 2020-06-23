@@ -117,19 +117,19 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
     return [];
   }
 
-  // Sort variables by organization, type, and key.
-  public function getAllSort() {
+  // Sort variables by organization, type, and key and paginate.
+  public function getAllSortPaginated($paginate) {
     return $this->model::with('organization')
       ->select('variables.*')
       ->leftjoin('organizations','organizations.id','=','variables.organization_id')
       ->orderBy('organizations.name')
       ->orderBy('variables.type')
       ->orderBy('variables.key')
-      ->get();
+      ->paginate($paginate);
   }
 
-  // Sort variables by organization, type, and key with where options
-  public function whereSort($data) {
+  // Sort variables by organization, type, and key with where options and paginate.
+  public function whereSortPaginated($data, $paginate) {
     return parent::whereOptions(
       $this->model::with('organization')
       ->select('variables.*')
@@ -137,7 +137,7 @@ class VariableRepository extends Repository implements VariableRepositoryInterfa
         ->orderBy('organizations.name')
         ->orderBy('variables.type')
         ->orderBy('variables.key')
-        ->get();
+        ->paginate($paginate);
   }
 
 }
