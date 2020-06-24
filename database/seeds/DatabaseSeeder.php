@@ -9,8 +9,8 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
-        // $this->call(UsersTableSeeder::class);
+    public function run() {
+      // This loads in constant variables that are needed for the production environment.
+      $this->call(VariableSeeder::class);
     }
 }

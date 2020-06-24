@@ -11,7 +11,7 @@ class UserType extends Model {
   protected $dates = ['deleted_at'];
 
   // The attributes that are mass assignable.
-  protected $fillable = [ 'name', 'route_access', 'created_by', 'updated_by', 'deleted_by' ];
+  protected $fillable = [ 'organization_id', 'name', 'route_access', 'created_by', 'updated_by', 'deleted_by' ];
 
   // Relationships
   public function users() {

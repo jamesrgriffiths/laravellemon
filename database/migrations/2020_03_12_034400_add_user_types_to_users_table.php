@@ -8,15 +8,15 @@ class AddUserTypesToUsersTable extends Migration {
 
   public function up() {
     Schema::table('users', function (Blueprint $table) {
-      $table->bigInteger('user_type')->unsigned()->nullable()->after('email');
-      $table->foreign('user_type')->references('id')->on('user_types');
+      $table->bigInteger('user_type_id')->unsigned()->nullable()->after('organization_id');
+      $table->foreign('user_type_id')->references('id')->on('user_types');
     });
   }
 
   public function down() {
     Schema::table('users', function (Blueprint $table) {
-      $table->dropForeign(['user_type']);
-      $table->dropColumn('user_type');
+      $table->dropForeign(['user_type_id']);
+      $table->dropColumn('user_type_id');
 
     });
   }

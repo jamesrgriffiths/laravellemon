@@ -14,7 +14,7 @@ class CreateUsersTable extends Migration {
       $table->string('email')->unique();
 
       $table->boolean('is_admin')->default(0);
-      $table->boolean('allow_login')->default(1);
+      $table->boolean('is_active')->default(1);
 
       $table->timestamp('last_logged_in')->nullable();
       $table->timestamp('email_verified_at')->nullable();
@@ -23,6 +23,13 @@ class CreateUsersTable extends Migration {
 
       $table->timestamps();
       $table->softDeletes();
+
+      $table->bigInteger('created_by')->unsigned()->nullable();
+      $table->foreign('created_by')->references('id')->on('users');
+      $table->bigInteger('updated_by')->unsigned()->nullable();
+      $table->foreign('updated_by')->references('id')->on('users');
+      $table->bigInteger('deleted_by')->unsigned()->nullable();
+      $table->foreign('deleted_by')->references('id')->on('users');
     });
   }
 

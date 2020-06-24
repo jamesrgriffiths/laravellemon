@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Repositories\Facades\UserFacade;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -33,8 +37,16 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
+    public function __construct() {
+      $this->middleware('guest')->except('logout');
     }
+
+    function attemptLogin(Request $request) {
+      return Auth::guard()->attempt(['email' => $request->email, 'password' => $request->password, 'is_active' => 1], $request->filled('remember'));
+    }
+
+    function authenticated(Request $request, $user) {
+      UserFacade::update($user->id,['last_logged_in' => Carbon::now()->toDateTimeString()]);
+    }
+
 }

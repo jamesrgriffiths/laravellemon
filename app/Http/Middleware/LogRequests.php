@@ -14,6 +14,12 @@ class LogRequests {
      * @return mixed
      */
     public function handle($request, Closure $next) {
+
+      // Don't log vue requests
+      if($request->vue) {
+        return $next($request);
+      }
+
       $log = LogFacade::logRequest($request);
       $start = microtime(true);
       $response = $next($request);

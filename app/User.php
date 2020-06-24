@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable {
+class User extends Authenticatable implements MustVerifyEmail {
 
   use Notifiable;
   use SoftDeletes;
 
   // The attributes that are mass assignable.
-  protected $fillable = [ 'name', 'email', 'user_type', 'is_admin', 'allow_login', 'password' ];
+  protected $fillable = [ 'organization_id', 'user_type_id', 'name', 'email', 'is_admin', 'is_active', 'last_logged_in', 'password', 'created_by', 'updated_by', 'deleted_by' ];
 
   // The attributes that should be hidden for arrays.
   protected $hidden = [ 'password', 'remember_token' ];
@@ -24,6 +24,10 @@ class User extends Authenticatable {
   // Relationships
   public function logs() {
     return $this->hasMany('App\Log');
+  }
+
+  public function organization() {
+    return $this->belongsTo('App\Organization');
   }
 
   public function userType() {

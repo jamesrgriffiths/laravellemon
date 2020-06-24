@@ -14,14 +14,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('layouts.app');
 });
-Auth::routes();
+Auth::routes(['verify' => true]);
 
+Route::resource('home', 'HomeController');
 
-Route::resource('home', 'HomeController')->middleware('auth');
-
-// Admin only routes
-Route::resource('logs', 'LogController')->middleware('auth');
-Route::resource('users', 'UserController')->middleware('auth');
-Route::resource('user_types', 'UserTypeController')->middleware('auth');
+// Primary Routes
+Route::resource('logs', 'LogController');
+Route::resource('organizations', 'OrganizationController');
+Route::resource('users', 'UserController');
+Route::resource('user_types', 'UserTypeController');
+Route::resource('variables', 'VariableController');

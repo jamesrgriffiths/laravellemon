@@ -6,6 +6,8 @@ interface RepositoryInterface {
 
   public function find($id);
 
+  public function getDistinctFields($field);
+
   public function getAll($orderBy,$orderByDirection,$take);
 
   public function getAllPaginated($orderBy,$orderByDirection,$number);
@@ -23,5 +25,11 @@ interface RepositoryInterface {
   public function update($id,$data);
 
   public function delete($id);
+
+  // SPECIAL QUERY FUNCTIONS
+
+  public function orderByAndTake($query,$orderBy,$orderByDirection,$take);
+
+  public function whereOptions($query,$data);
 
 }
