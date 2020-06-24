@@ -8,35 +8,38 @@
 .lemon-form {
   position: relative;
   display: inline-block;
-  width: 450px;
   padding: 5px;
   margin: auto;
+  text-align: center;
+  width: 450px;
+}
+
+@media only screen and (max-width: 480px) {
+  .lemon-form {
+    width: 90vw;
+  }
 }
 
 .lemon-form-container {
   position: absolute;
   display: flex;
   width: 100vw;
-  padding-top: 50px;
+  padding-top: 100px;
 }
 
 .lemon-form-title {
   position: relative;
   display: inline-block;
-  width: 450px;
-  margin-bottom: 10px;
-  text-align: center;
+  margin-bottom: 20px;
   color: #636b6f;
   font-family: 'Nunito', sans-serif;
   font-size: 32px;
-  border-bottom: thin solid var(--secondary);
 }
 
 .lemon-link {
   color: var(--secondary);
-  padding: 0 10px;
-  font-family: 'Nunito', sans-serif;
-  font-size 12px;
+  padding: 0 5px;
+  font-size 10px;
   font-weight: bold;
   letter-spacing: .1rem;
   text-decoration: none;
@@ -49,14 +52,12 @@
 
 .lemon-nav-left {
   position: absolute;
-  left: 10px;
-  top: 20px;
+  left: 5px;
 }
 
 .lemon-nav-right {
   position: absolute;
-  right: 10px;
-  top: 20px;
+  right: 5px;
 }
 
 .lemon-title {
@@ -78,7 +79,7 @@
   align-items: center;
   position: absolute;
   width: 100vw;
-  top: 40vh;
+  top: 20vh;
   justify-content: center;
   text-align: center;
 }

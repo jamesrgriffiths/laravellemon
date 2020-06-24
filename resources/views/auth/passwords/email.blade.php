@@ -33,7 +33,7 @@
 
         <div class="row">
           <div class="col col-12">
-            <button type="submit" class="btn btn-block btn-outline-primary">Send Password Reset Link</button>
+            <button type="submit" class="btn btn-block btn-outline-info">Send Password Reset Link</button>
           </div>
         </div>
 
@@ -41,5 +41,5 @@
 
     </div>
   </div>
-  
+
 @endsection

@@ -58,7 +58,7 @@
 
         <div class="row">
           <div class="col col-12">
-            <button type="submit" class="btn btn-block btn-outline-primary">Register</button>
+            <button type="submit" class="btn btn-block btn-outline-info">Register</button>
           </div>
         </div>
 
@@ -66,5 +66,5 @@
 
     </div>
   </div>
-  
+
 @endsection

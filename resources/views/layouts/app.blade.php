@@ -59,16 +59,24 @@
 
         <!-- Don't show the nav title on the welcome page -->
         @if(!in_array(explode(".",Route::current()->getName())[0],['','/']))
-          <a class="navbar-brand mr-auto lemon-title-nav" href="\">
-            {{config('app.name')}}
-            @if(session('organization'))
-              - {{session('organization')->name}}
-            @endif
+          @auth
+            <a class="navbar-brand lemon-title-nav text-primary m-auto pr-5" href="\">
+              <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
+              @if(session('organization'))
+                {{session('organization')->name}}
+              @else
+                {{config('app.name')}}
+              @endif
+            </a>
+          @else
+          <a class="navbar-brand lemon-title-nav text-primary mr-auto" href="\">
+            <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
           </a>
+          @endauth
         @endif
 
         <!-- Allow login and register if the user is not logged in -->
-        <div class="lemon-nav-right">
+        <div class="lemon-nav-right mt-1">
           @guest
             <a class="lemon-link" href="{{ route('login') }}">{{ __('Login') }}</a>
             <a class="lemon-link" href="{{ route('register') }}">{{ __('Register') }}</a>
@@ -81,15 +89,15 @@
       @if(in_array(explode(".",Route::current()->getName())[0],['','/']))
         <div class="lemon-welcome">
             <div class="lemon-title">
-              {{config('app.name')}}
+              <img src="./lemon-outline-name2.png" class="img-fluid m-3" width="400">
               @if(session('organization'))
                 <br/><h3>{{session('organization')->name}}</h3>
               @endif
             </div>
-            <br/>
-            <br/>
-            <a class="lemon-link" href="https://jamesgriffithsdevelopment.com">Website</a>
-            <a class="lemon-link" href="https://github.com/jamesrgriffiths/laravellemon">GitHub</a>
+            <div class="ml-5">
+              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com">Website</a>
+              <a class="lemon-link" href="https://github.com/jamesrgriffiths/laravellemon">GitHub</a>
+            </div>
         </div>
 
       <!-- All other pages - add vue templates if they exist otherwise it will yeild content -->

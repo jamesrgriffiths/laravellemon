@@ -39,8 +39,8 @@
 
         <div class="row">
           <div class="col col-12 text-center">
-            <button type="submit" class="btn btn-block btn-outline-primary">Login</button>
-            <a class="btn btn-link" href="{{ route('password.request') }}">Forgot Your Password?</a>
+            <button type="submit" class="btn btn-block btn-outline-info">Login</button>
+            <a class="btn btn-link text-info" href="{{ route('password.request') }}">Forgot Your Password?</a>
           </div>
         </div>
 
@@ -48,5 +48,5 @@
 
     </div>
   </div>
-  
+
 @endsection
