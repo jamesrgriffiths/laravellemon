@@ -27,7 +27,7 @@ npm install
 
 Setup your environment
 ```
-cp example.env .env
+cp .env.example .env
 php artisan key:generate
 ```
  - Now you will need to open the .env file and set your database connection settings (if it's a local mysql database you should just need the name, username, and password)
