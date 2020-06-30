@@ -12,13 +12,8 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/lemon.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -61,7 +56,7 @@
         @if(!in_array(explode(".",Route::current()->getName())[0],['','/']))
           @auth
             <a class="navbar-brand lemon-title-nav text-primary m-auto pr-5" href="\">
-              <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
+              <img src="./logo-icon.png" class="img-fluid mb-1" width="28" height="28">
               @if(session('organization'))
                 {{session('organization')->name}}
               @else
@@ -70,7 +65,7 @@
             </a>
           @else
           <a class="navbar-brand lemon-title-nav text-primary mr-auto" href="\">
-            <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
+            <img src="./logo-icon.png" class="img-fluid mb-1" width="28" height="28">
           </a>
           @endauth
         @endif
@@ -89,13 +84,13 @@
       @if(in_array(explode(".",Route::current()->getName())[0],['','/']))
         <div class="lemon-welcome">
             <div class="lemon-title">
-              <img src="./lemon-outline-name2.png" class="img-fluid m-3" width="400">
+              <img src="./logo.png" class="img-fluid m-3" width="400">
               @if(session('organization'))
                 <br/><h3>{{session('organization')->name}}</h3>
               @endif
             </div>
-            <div class="ml-5">
-              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com">Website</a>
+            <div class="ml-3">
+              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com/laravellemon">Website</a>
               <a class="lemon-link" href="https://github.com/jamesrgriffiths/laravellemon">GitHub</a>
             </div>
         </div>
