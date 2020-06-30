@@ -3,6 +3,7 @@
   loading - The loading attribute.
   label - The label for each item.
   label_class - The special class (often color) for the label.
+  image - The location of an image to display with the title.
   data - The data to display, an array representing the columns to display: [{title,value},...]
   data_space - Data to display with a larger amount of space - either an array that will be displayed with buttons or text.
   options - The button options available: [{action,class,target,display,disabled},...]
@@ -13,6 +14,7 @@
     <div class="col col-8">
       <div class="row">
         <div class="col col-12 my-auto" :class="data_space ? 'col-md-3' : 'col-md-4'">
+          <img v-if="image" :src="image" class="lemon-image-thumbnail">
           <span v-for="item in column_1"><b>{{item.title ? item.title+': ' : ''}}</b><span :class="item.special_class">{{item.value}}</span><br/></span>
         </div>
         <div class="col col-12 my-auto" :class="data_space ? 'col-md-3' : 'col-md-4'">
@@ -38,7 +40,7 @@
 
 <script>
   export default {
-    props: ['index', 'loading', 'label', 'label_class', 'data', 'data_space', 'options'],
+    props: ['index', 'loading', 'label', 'label_class', 'image', 'data', 'data_space', 'options'],
     data() {
       return {
         column_1: [],
@@ -47,9 +49,14 @@
       }
     },
     created() {
-      if(this.data_space) {
+      if(this.data_space && this.image) {
+        this.column_2 = this.data;
+      } else if(this.data_space && !this.image) {
         this.column_1 = this.data.slice(0,Math.ceil(this.data.length/2));
         this.column_2 = this.data.slice(Math.ceil(this.data.length/2));
+      } else if(!this.data_space && this.image) {
+        this.column_2 = this.data.slice(0,Math.ceil(this.data.length/2));
+        this.column_3 = this.data.slice(Math.ceil(this.data.length/2));
       } else {
         this.column_1 = this.data.slice(0,Math.ceil(this.data.length/3));
         this.column_2 = this.data.slice(Math.ceil(this.data.length/3),Math.ceil(2*(this.data.length/3)));

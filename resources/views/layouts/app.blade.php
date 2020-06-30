@@ -56,7 +56,7 @@
         @if(!in_array(explode(".",Route::current()->getName())[0],['','/']))
           @auth
             <a class="navbar-brand lemon-title-nav text-primary m-auto pr-5" href="\">
-              <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
+              <img src="./logo-icon.png" class="img-fluid mb-1" width="28" height="28">
               @if(session('organization'))
                 {{session('organization')->name}}
               @else
@@ -65,7 +65,7 @@
             </a>
           @else
           <a class="navbar-brand lemon-title-nav text-primary mr-auto" href="\">
-            <img src="./lemon-outline-L.png" class="img-fluid mb-1" width="28" height="28">
+            <img src="./logo-icon.png" class="img-fluid mb-1" width="28" height="28">
           </a>
           @endauth
         @endif
@@ -84,7 +84,7 @@
       @if(in_array(explode(".",Route::current()->getName())[0],['','/']))
         <div class="lemon-welcome">
             <div class="lemon-title">
-              <img src="./lemon-outline-name2.png" class="img-fluid m-3" width="400">
+              <img src="./logo.png" class="img-fluid m-3" width="400">
               @if(session('organization'))
                 <br/><h3>{{session('organization')->name}}</h3>
               @endif
