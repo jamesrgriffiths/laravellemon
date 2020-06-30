@@ -1,3 +1,32 @@
+//
+// Style adjustments for small screens
+//
+@media only screen and (max-width: 575px) {
+  .modal-dialog {
+    width: 90vw;
+    left: 3vw;
+    top: 10vw;
+  }
+}
+
+//
+// Style adjustments
+//
+
+.navbar {
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.row {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+//
+// Custom styles
+//
+
 .lemon-dropdown-name {
   display: block;
   width: 100%;
@@ -39,7 +68,6 @@
 .lemon-link {
   color: var(--secondary);
   padding: 0 5px;
-  font-size 10px;
   font-weight: bold;
   letter-spacing: .1rem;
   text-decoration: none;
@@ -72,7 +100,7 @@
   font-size: 20px;
   padding: 0px;
   margin: 0px;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .lemon-welcome {

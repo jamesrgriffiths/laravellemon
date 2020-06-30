@@ -12,13 +12,8 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/lemon.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -94,8 +89,8 @@
                 <br/><h3>{{session('organization')->name}}</h3>
               @endif
             </div>
-            <div class="ml-5">
-              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com">Website</a>
+            <div class="ml-3">
+              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com/laravellemon">Website</a>
               <a class="lemon-link" href="https://github.com/jamesrgriffiths/laravellemon">GitHub</a>
             </div>
         </div>
