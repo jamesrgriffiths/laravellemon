@@ -1,6 +1,8 @@
 <p align="center"><img src="public/logo.png" width="400"></p>
 
-<a href="https://jamesgriffithsdevelopment.com/projects/laravellemon">Documentation</a>
+<p align="center">
+    <a href="https://jamesgriffithsdevelopment.com/project/laravellemon" target="_blank">Documentation</a>
+</p>
 
 <p align="center">
 <a href="https://opensource.org/licenses/"><img src="https://img.shields.io/badge/License-GPL%20v3-yellow.svg" alt="License"></a>
