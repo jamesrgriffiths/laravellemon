@@ -90,7 +90,7 @@
               @endif
             </div>
             <div class="ml-3">
-              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com/laravellemon">Website</a>
+              <a class="lemon-link" href="https://jamesgriffithsdevelopment.com/project/laravellemon">Website</a>
               <a class="lemon-link" href="https://github.com/jamesrgriffiths/laravellemon">GitHub</a>
             </div>
         </div>
