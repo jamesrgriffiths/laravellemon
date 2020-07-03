@@ -15,7 +15,7 @@ Laravel Lemon is a scaffold built on top of the Laravel framework (7.1) with log
 ## Setup - command line for new projects
 You will need to setup your server for the new project, additionally if you wish to use the built in sub domain feature you will need to set up wildcard sub domains. The sub domain feature allows every organization created in your application to use their own sub domain of your site. This will allow new users to register under that organization and filter some views (such as users) to just those under the given organization. The remaining basic setup steps are below.
 
-Clone the repository and set it to your repo.
+Get the project - you can download one of the releases, fork it on github and then clone your fork, or just clone this repository. If you do choose to directly clone it just make sure you reset the origin as in the last 2 steps below.
 ```
 git clone https://github.com/jamesrgriffiths/laravellemon.git <your-project>
 cd <your-project>
