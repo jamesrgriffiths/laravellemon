@@ -1,4 +1,6 @@
-<p align="center"><img src="public/lemon-outline-name2.png" width="400"></p>
+<p align="center"><img src="public/logo.png" width="400"></p>
+
+<a href="https://jamesgriffithsdevelopment.com/projects/laravellemon">Documentation</a>
 
 <p align="center">
 <a href="https://opensource.org/licenses/"><img src="https://img.shields.io/badge/License-GPL%20v3-yellow.svg" alt="License"></a>
